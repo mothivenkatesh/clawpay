@@ -4,7 +4,7 @@
 *Inspired by OpenClaw. Built for Money Movement.*
 
 **Date:** March 23, 2026
-**Author:** Sagar Mothiram | PMM, Cashfree Payments
+**Author:** Mothi Venkatesh | PMM, Cashfree Payments
 **Status:** Draft v1.0 — For WTFraud Community Feedback
 
 ---
