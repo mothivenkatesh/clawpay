@@ -2,7 +2,7 @@
 
 **AI agents for compliance, lending & money movement.**
 
-The open-core engine that verifies, decides, allocates, and executes — before a single rupee moves. Built on [Cashfree](https://www.cashfree.com) rails.
+The open-core engine that verifies, decides, allocates, and executes: before a single rupee moves. Built on [Cashfree](https://www.cashfree.com) rails.
 
 Inspired by [OpenClaw](https://github.com/nicepkg/openclaw) (250K+ GitHub stars). Positioned as the pre-transaction complement to [Razorpay Agent Studio](https://razorpay.com/blog/agent-studio-ai-agents-by-razorpay/).
 
@@ -12,11 +12,11 @@ Inspired by [OpenClaw](https://github.com/nicepkg/openclaw) (250K+ GitHub stars)
 
 ## The Problem
 
-Razorpay just launched AI agents for **after** money moves — disputes, cart recovery, cashflow forecasting.
+Razorpay just launched AI agents for **after** money moves: disputes, cart recovery, cashflow forecasting.
 
-Nobody built AI agents for **before** money moves — verify identity, decide eligibility, calculate allocation, execute disbursement, comply with RBI.
+Nobody built AI agents for **before** money moves: verify identity, decide eligibility, calculate allocation, execute disbursement, comply with RBI.
 
-Today this is 4–6 vendors, Excel spreadsheets, and 3+ days of human ops.
+Today this is 4 to 6 vendors, Excel spreadsheets, and 3+ days of human ops.
 
 ```
 CUSTOMER JOURNEY:
@@ -39,7 +39,7 @@ Identity → Onboarding → Verify → Decide → Allocate → Execute
 ## Three Agents
 
 ### 🛡️ Compliance Agent
-Pre-configured KYC journeys — CDD, EDD, V-CIP, mule screening. Runs the full verify → decide flow. From 6 vendor integrations to one config.
+Pre-configured KYC journeys: CDD, EDD, V-CIP, mule screening. Runs the full verify → decide flow. From 6 vendor integrations to one config.
 
 ### 💰 Allocation Agent
 Co-lending splits, escrow, TDS, conditional disbursement, time-based release. What finance teams do in Excel today. Fires Cashfree Payouts autonomously.
@@ -57,7 +57,7 @@ docker-compose up -d
 # Open browser → Build flow → Simulate → Deploy
 ```
 
-### AI Parser — Describe Flows in English
+### AI Parser: Describe Flows in English
 
 ```
 "Verify Aadhaar, match face, check CIBIL > 680,
@@ -88,7 +88,7 @@ But three use cases genuinely need a rule engine:
 
 | Use Case | Why KYC Studio Can't | Why Clawpay Can |
 |----------|---------------------|-----------------|
-| **Continuous Monitoring** | Workflow builders run once on trigger. Monitoring needs scheduled autonomous execution — rules firing daily on millions of accounts. | Monitoring Agent runs on cron: daily deduplication, dynamic trust scoring, automated EDD triggers. |
+| **Continuous Monitoring** | Workflow builders run once on trigger. Monitoring needs scheduled autonomous execution: rules firing daily on millions of accounts. | Monitoring Agent runs on cron: daily deduplication, dynamic trust scoring, automated EDD triggers. |
 | **Mule Detection (Post-Activation)** | KYC Studio has no concept of "check this account again in 7 days." | T+1, T+7, T+30 behavioral rules. Initial deposit withdrawal patterns. Network graph updates. |
 | **Co-Lending Allocation** | No workflow builder handles split math, escrow logic, or conditional disbursement. | Allocation Agent: 80/20 splits, TDS deduction, time-based release, failure routing, reconciliation. |
 
@@ -161,7 +161,7 @@ For a bank running continuous monitoring on 10M accounts, LLM token costs would 
 
 - **$19.3B** Decision Management TAM by 2032 (15.8% CAGR)
 - **$133B** India digital lending revenue by 2030
-- **62 NBFCs** penalized by RBI (2023–2025) for compliance failures
+- **62 NBFCs** penalized by RBI (2023 to 2025) for compliance failures
 - **₹250 Cr** maximum penalty under DPDP Act
 - **Zero vendors** offer containerized on-prem KYC + BRE + execution stack
 - **RBI CLA 2025** (effective Jan 1, 2026): mandatory escrow, 15-day settlement, NPA sync
