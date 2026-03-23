@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clawpay — AI Agents for Compliance, Lending & Money Movement</title>
+<meta name="description" content="The open-core financial operations engine. AI agents that verify, decide, allocate, and execute — before money moves.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #08080d;
+    --surface: #111118;
+    --surface-2: #1a1a24;
+    --surface-3: #222233;
+    --border: #2a2a3d;
+    --text: #eeeef2;
+    --text-2: #b0b0c0;
+    --text-3: #707088;
+    --accent: #635bff;
+    --accent-light: #8b85ff;
+    --accent-glow: rgba(99, 91, 255, 0.12);
+    --accent-glow-strong: rgba(99, 91, 255, 0.25);
+    --green: #30d158;
+    --green-dim: rgba(48, 209, 88, 0.10);
+    --red: #ff453a;
+    --red-dim: rgba(255, 69, 58, 0.10);
+    --amber: #ffd60a;
+    --amber-dim: rgba(255, 214, 10, 0.08);
+    --cyan: #64d2ff;
+    --cyan-dim: rgba(100, 210, 255, 0.10);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── Slide system ─── */
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 56px 80px 56px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--surface-3) transparent;
+  }
+  .slide.active { display: flex; }
+
+  /* ─── Progress ─── */
+  #progress {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    transition: width .35s ease; z-index: 200;
+  }
+
+  /* ─── Signpost ─── */
+  #signpost {
+    position: fixed; top: 14px; right: 32px;
+    display: flex; gap: 5px; z-index: 200;
+  }
+  #signpost span {
+    font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 100px;
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--text-3);
+    transition: all .2s;
+  }
+  #signpost span.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ─── Nav ─── */
+  .nav {
+    position: fixed; bottom: 20px; right: 28px;
+    display: flex; gap: 6px; align-items: center; z-index: 200;
+  }
+  .nav button {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--text); font-size: 14px; cursor: pointer;
+    transition: all .15s; display: grid; place-items: center;
+  }
+  .nav button:hover { background: var(--accent); border-color: var(--accent); }
+  .nav .ct { font-size: 11px; color: var(--text-3); min-width: 48px; text-align: center; font-variant-numeric: tabular-nums; }
+
+  /* ─── Typography ─── */
+  .label {
+    font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--accent-light); margin-bottom: 12px;
+  }
+  h1 { font-size: 52px; font-weight: 800; line-height: 1.08; letter-spacing: -.03em; margin-bottom: 20px; }
+  h2 { font-size: 36px; font-weight: 700; line-height: 1.15; letter-spacing: -.02em; margin-bottom: 16px; }
+  h3 { font-size: 20px; font-weight: 700; line-height: 1.3; margin-bottom: 8px; }
+  .sub { font-size: 20px; color: var(--text-2); line-height: 1.55; max-width: 680px; }
+  .sub-s { font-size: 16px; color: var(--text-2); line-height: 1.55; }
+  .hi { color: var(--accent-light); }
+  .gr { color: var(--green); }
+  .rd { color: var(--red); }
+  .am { color: var(--amber); }
+  .cy { color: var(--cyan); }
+  .dim { color: var(--text-3); }
+  .sm { font-size: 13px; }
+  .xs { font-size: 11px; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .bold { font-weight: 700; }
+  .center { text-align: center; }
+
+  /* ─── Layout helpers ─── */
+  .mid { justify-content: center; align-items: center; text-align: center; }
+  .mid .sub { margin: 0 auto; }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+  .g4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; }
+  .flex { display: flex; }
+  .flex-1 { flex: 1; }
+  .gap-12 { gap: 12px; }
+  .gap-16 { gap: 16px; }
+  .gap-24 { gap: 24px; }
+  .mt-8 { margin-top: 8px; } .mt-12 { margin-top: 12px; } .mt-16 { margin-top: 16px; }
+  .mt-20 { margin-top: 20px; } .mt-24 { margin-top: 24px; } .mt-32 { margin-top: 32px; }
+  .mb-8 { margin-bottom: 8px; } .mb-12 { margin-bottom: 12px; } .mb-16 { margin-bottom: 16px; }
+  .mb-24 { margin-bottom: 24px; } .mb-32 { margin-bottom: 32px; }
+
+  /* ─── Cards ─── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+  .card-s { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; }
+  .card.glow { border-color: var(--accent); background: linear-gradient(135deg, var(--accent-glow) 0%, var(--surface) 100%); }
+  .bl-accent { border-left: 3px solid var(--accent); }
+  .bl-green { border-left: 3px solid var(--green); }
+  .bl-red { border-left: 3px solid var(--red); }
+  .bl-amber { border-left: 3px solid var(--amber); }
+  .bl-cyan { border-left: 3px solid var(--cyan); }
+
+  /* ─── Stats ─── */
+  .stat { text-align: center; }
+  .stat .n { font-size: 48px; font-weight: 800; line-height: 1; letter-spacing: -.02em; }
+  .stat .n.sm-n { font-size: 36px; }
+  .stat .l { font-size: 13px; color: var(--text-3); margin-top: 6px; line-height: 1.4; }
+
+  /* ─── Tags ─── */
+  .tag {
+    display: inline-block; padding: 3px 10px; border-radius: 100px;
+    font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  }
+  .tag.t-accent { background: var(--accent-glow); color: var(--accent-light); }
+  .tag.t-green { background: var(--green-dim); color: var(--green); }
+  .tag.t-red { background: var(--red-dim); color: var(--red); }
+  .tag.t-amber { background: var(--amber-dim); color: var(--amber); }
+  .tag.t-cyan { background: var(--cyan-dim); color: var(--cyan); }
+
+  /* ─── Tables ─── */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+  }
+  td { padding: 9px 12px; border-bottom: 1px solid rgba(42,42,61,.4); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .ck { color: var(--green); } .cx { color: var(--red); opacity:.7; } .cw { color: var(--amber); }
+
+  /* ─── Code ─── */
+  .code {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    line-height: 1.75; white-space: pre; overflow-x: auto;
+  }
+  .code .c { color: var(--text-3); } .code .k { color: var(--accent-light); }
+  .code .s { color: var(--green); } .code .v { color: var(--amber); }
+
+  /* ─── Flow ─── */
+  .flow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .fs {
+    background: var(--surface-2); border: 1px solid var(--border); padding: 6px 14px;
+    border-radius: 8px; font-size: 13px; font-weight: 600;
+  }
+  .fs.active { background: var(--accent-glow-strong); border-color: var(--accent); color: var(--accent-light); }
+  .fa { color: var(--text-3); font-size: 16px; }
+
+  /* ─── Callout ─── */
+  .callout {
+    background: var(--accent-glow); border: 1px solid rgba(99,91,255,.3);
+    border-radius: 10px; padding: 16px 20px; font-size: 15px; line-height: 1.5;
+  }
+
+  /* ─── Bullets ─── */
+  .bl { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .bl li { padding-left: 18px; position: relative; font-size: 15px; line-height: 1.5; }
+  .bl li::before {
+    content: ''; position: absolute; left: 0; top: 8px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
+
+  /* ─── Timeline ─── */
+  .tl-item { position: relative; padding-left: 28px; padding-bottom: 20px; }
+  .tl-item::before {
+    content: ''; position: absolute; left: 8px; top: 8px; bottom: 0;
+    width: 1px; background: var(--border);
+  }
+  .tl-item:last-child::before { display: none; }
+  .tl-item::after {
+    content: ''; position: absolute; left: 4px; top: 6px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--bg);
+  }
+
+  /* ─── Logo ─── */
+  .logo { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+  .logo .c { color: var(--accent-light); }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 1024px) {
+    .slide { padding: 32px 36px; }
+    h1 { font-size: 36px; } h2 { font-size: 28px; }
+    .g2, .g3, .g4 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="signpost">
+  <span data-s="open">Opening</span>
+  <span data-s="gap">The Gap</span>
+  <span data-s="agents">Agents</span>
+  <span data-s="arch">Architecture</span>
+  <span data-s="market">Market</span>
+  <span data-s="vs">Competition</span>
+  <span data-s="build">Build</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S1: TITLE — Big Statement -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide mid active" data-s="open">
+  <div class="logo mb-32"><span class="c">Claw</span>pay</div>
+  <h1>AI agents for compliance,<br>lending &amp; <span class="hi">money movement</span></h1>
+  <p class="sub mb-32">The open-core engine that verifies, decides, allocates, and executes &mdash; before a single rupee moves. Built on Cashfree rails.</p>
+  <div class="flex gap-24" style="justify-content:center;">
+    <span class="tag t-accent">Open-Core (MIT)</span>
+    <span class="tag t-green">Docker-First</span>
+    <span class="tag t-cyan">Cashfree-Native</span>
+  </div>
+  <p class="dim xs mt-32">Inspired by OpenClaw (250K+ GitHub stars) &middot; March 2026</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S2: SITUATION — What everyone agrees on -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide mid" data-s="open">
+  <p class="label">The world just changed</p>
+  <h1>Razorpay built AI agents<br>for <span class="am">after</span> money moves.</h1>
+  <p class="sub mb-32">Agent Studio: 8 agents for disputes, cart recovery, RTO, cashflow forecasting. Built on Anthropic&rsquo;s Claude. Launched FTX&rsquo;26.</p>
+  <p class="sub" style="font-size:24px;color:var(--text);max-width:600px;font-weight:600;">
+    &ldquo;Without us, AI just talks; with us, it transacts.&rdquo;<br>
+    <span class="dim sm">&mdash; Harshil Mathur, CEO Razorpay</span>
+  </p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S3: COMPLICATION — The gap -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide mid" data-s="gap">
+  <p class="label">The complication</p>
+  <h1>Nobody built AI agents<br>for <span class="rd">before</span> money moves.</h1>
+  <p class="sub">Verify identity. Decide eligibility. Calculate allocation. Execute disbursement. Comply with RBI. Today this is 4&ndash;6 vendors, Excel spreadsheets, and 3+ days of human ops.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S4: DATA — The gap is real -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" data-s="gap">
+  <p class="label">The evidence</p>
+  <h2>The compliance gap is existential &mdash; and the fines prove it.</h2>
+  <div class="g3 mt-24 mb-32">
+    <div class="stat"><div class="n rd">62</div><div class="l">NBFCs penalized by RBI<br>2023&ndash;2025</div></div>
+    <div class="stat"><div class="n rd">&nbsp;&#8377;250Cr</div><div class="l">Maximum penalty under<br>DPDP Act</div></div>
+    <div class="stat"><div class="n am">60%</div><div class="l">of onboarding costs<br>spent on KYC (BCG)</div></div>
+  </div>
+  <div class="g2">
+    <div class="card bl-red">
+      <h3>RBI CLA 2025 &mdash; Effective Jan 1, 2026</h3>
+      <ul class="bl mt-12">
+        <li>Mandatory borrower-level escrow for every co-lending pair</li>
+        <li>15-day settlement deadline &mdash; miss it, full loan stays with originator</li>
+        <li>Real-time NPA synchronization between co-lenders</li>
+        <li>NBFC minimum retention drops 20% &rarr; 10% &mdash; more complex math</li>
+      </ul>
+    </div>
+    <div class="card bl-red">
+      <h3>V-CIP On-Prem Mandate</h3>
+      <ul class="bl mt-12">
+        <li>Infrastructure <strong>must</strong> be on RE&rsquo;s premises</li>
+        <li>Third-party video platforms <strong>not permitted</strong></li>
+        <li>All data stored <strong>in India only</strong></li>
+        <li>No vendor offers containerized on-prem KYC + BRE + execution</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S5: GAP TABLE — Every competitor stops somewhere -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" data-s="gap">
+  <p class="label">The 5 gaps</p>
+  <h2>Every competitor stops somewhere. Nobody closes the full loop.</h2>
+  <div class="mt-20" style="overflow-x:auto;">
+    <table>
+      <tr><th style="width:18%">Gap</th><th style="width:38%">What happens today</th><th style="width:38%">What should happen</th></tr>
+      <tr><td><strong>Verify &rarr; Act</strong></td><td>KYC passes. Human initiates next step. <span class="tag t-red">3+ days</span></td><td>Verification triggers rule &rarr; money moves. <span class="tag t-green">4 seconds</span></td></tr>
+      <tr><td><strong>Rule &rarr; Execute</strong></td><td>BRE decides. Output goes to Excel.</td><td>Rule engine triggers Payout/PG via API. <span class="tag t-green">Zero human</span></td></tr>
+      <tr><td><strong>Allocate &rarr; Disburse</strong></td><td>Finance calculates splits in spreadsheet.</td><td>Allocation rules auto-calculate, auto-disburse.</td></tr>
+      <tr><td><strong>Comply &rarr; Audit</strong></td><td>Decisions logged across 4 systems.</td><td>Every execution immutably logged. <span class="tag t-green">Regulator-ready</span></td></tr>
+      <tr><td><strong>Cloud &rarr; On-Prem</strong></td><td>3&ndash;6 month implementation. Crores.</td><td><span class="tag t-green">Docker pull. Live in hours.</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S6: OPENCLAW CONTEXT -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" data-s="open">
+  <p class="label">The precedent</p>
+  <h2>OpenClaw proved open-core agents can change an industry overnight.</h2>
+  <div class="g2 mt-24">
+    <div>
+      <div class="g3 mb-24">
+        <div class="stat"><div class="n sm-n hi">250K</div><div class="l">GitHub stars<br>in ~100 days</div></div>
+        <div class="stat"><div class="n sm-n hi">47.7K</div><div class="l">Forks</div></div>
+        <div class="stat"><div class="n sm-n hi">1,075</div><div class="l">Contributors</div></div>
+      </div>
+      <div class="card-s bl-accent mb-12">
+        <p class="sm"><strong>Jensen Huang:</strong> &ldquo;Probably the single most important release of software&hellip; probably ever.&rdquo;</p>
+      </div>
+      <div class="card-s bl-accent mb-12">
+        <p class="sm"><strong>Sam Altman:</strong> Hired the creator. OpenClaw transitioned to an independent foundation.</p>
+      </div>
+      <div class="card-s bl-amber">
+        <p class="sm"><strong>Lesson:</strong> Anthropic sent lawyers. OpenAI sent a job offer. How you treat builders matters.</p>
+      </div>
+    </div>
+    <div>
+      <h3 class="mb-16">OpenClaw&rsquo;s manifesto:</h3>
+      <p class="sub-s mb-24" style="font-size:20px;color:var(--text);">&ldquo;Your assistant. Your data. Your rules.&rdquo;</p>
+      <h3 class="mb-16">Clawpay&rsquo;s manifesto:</h3>
+      <p style="font-size:28px;font-weight:700;color:var(--green);line-height:1.3;">&ldquo;Your rules. Your money. Your infra.&rdquo;</p>
+      <div class="callout mt-24">
+        <p class="sm">OpenClaw gave everyone a personal AI agent.<br><strong>Clawpay gives every fintech their financial operations agent.</strong><br>Same philosophy. Built for money movement.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S7: ANSWER — Three Agents -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide mid" data-s="agents">
+  <p class="label">The answer</p>
+  <h1>Three agents. Three unsolved problems.<br>One <span class="hi">platform</span>.</h1>
+  <div class="g3 mt-32" style="max-width:960px;margin-left:auto;margin-right:auto;">
+    <div class="card glow" style="text-align:left;">
+      <span class="tag t-accent mb-12">Agent 1</span>
+      <h3>Compliance Agent</h3>
+      <p class="sub-s mt-8">Pre-configured KYC journeys. CDD, EDD, V-CIP, mule screening. Runs the full verify &rarr; decide flow. From 6 vendor integrations to one config.</p>
+    </div>
+    <div class="card glow" style="text-align:left;">
+      <span class="tag t-green mb-12">Agent 2</span>
+      <h3>Allocation Agent</h3>
+      <p class="sub-s mt-8">Co-lending splits, escrow, TDS, conditional disbursement, time-based release. What finance teams do in Excel. Fires Cashfree Payouts autonomously.</p>
+    </div>
+    <div class="card glow" style="text-align:left;">
+      <span class="tag t-cyan mb-12">Agent 3</span>
+      <h3>Monitoring Agent</h3>
+      <p class="sub-s mt-8">Continuous post-onboarding surveillance. Daily deduplication, dynamic trust scoring, T+1/T+7/T+30 behavioral rules. KYC Studio can&rsquo;t do this.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S8: COMPLIANCE AGENT — Use case -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" data-s="agents">
+  <p class="label">Compliance Agent</p>
+  <h2>Loan disbursement: from 6 vendor integrations to one config file.</h2>
+  <div class="flow mt-20 mb-24">
+    <span class="fs">Aadhaar OCR</span><span class="fa">&rarr;</span>
+    <span class="fs">PAN OCR</span><span class="fa">&rarr;</span>
+    <span class="fs">FaceMatch</span><span class="fa">&rarr;</span>
+    <span class="fs">Liveness</span><span class="fa">&rarr;</span>
+    <span class="fs">Bank Verify</span><span class="fa">&rarr;</span>
+    <span class="fs active">Eligibility Rule</span><span class="fa">&rarr;</span>
+    <span class="fs active">Allocation</span><span class="fa">&rarr;</span>
+    <span class="fs" style="border-color:var(--green);color:var(--green);">Cashfree Payout</span>
+  </div>
+  <div class="g2">
+    <div class="code"><span class="c"># Allocation fires automatically:</span>
+Loan amount:       <span class="v">&#8377;2,00,000</span>
+Processing fee 2%: <span class="v">&#8377;4,000</span>  &rarr; Platform
+Co-lending split:  <span class="v">80%</span> Bank A / <span class="v">20%</span> NBFC B
+Insurance:         <span class="v">&#8377;450</span>   &rarr; Insurer
+Net disbursal:     <span class="s">&#8377;1,95,550</span> &rarr; Borrower
+
+<span class="k">Total flow time: 4.2 seconds</span></div>
+    <div>
+      <div class="g2" style="gap:16px;">
+        <div class="card-s bl-red">
+          <p class="tag t-red mb-8">Today</p>
+          <ul class="bl sm"><li>4&ndash;6 vendor integrations</li><li>Weeks of engineering</li><li>Excel allocation</li><li>Manual payout</li></ul>
+        </div>
+        <div class="card-s bl-green">
+          <p class="tag t-green mb-8">Clawpay</p>
+          <ul class="bl sm"><li>One YAML config</li><li>2-hour setup</li><li>Auto allocation</li><li>Autonomous disbursal</li></ul>
+        </div>
+      </div>
+      <div class="callout mt-16">
+        <p class="sm"><strong>ICP:</strong> Mid-market NBFCs (&#8377;100&ndash;500 Cr AUM). 2,000+ in India. Under RBI compliance pressure. Can&rsquo;t afford Lentra&rsquo;s pricing or timeline.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S9: AI PARSER — How it works -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" data-s="arch">
+  <p class="label">Architecture</p>
+  <h2>Describe your flow in English. Clawpay wires it to Cashfree. Automatically.</h2>
+  <div class="g2 mt-24">
+    <div>
+      <div class="card mb-16" style="border-color:var(--cyan)">
+        <h3 class="cy">AI Parser &mdash; Plug Cashfree Rails in Seconds</h3>
+        <p class="sub-s mt-12">Describe your workflow in plain English. The AI parser generates the YAML config, maps to Cashfree API endpoints, and wires trigger &rarr; rule &rarr; action automatically.</p>
+        <div class="code mt-16"><span class="c"># You describe:</span>
+<span class="s">"Verify Aadhaar, match face,
+ check CIBIL &gt; 680,
+ disburse 80/20 co-lending split"</span>
+
+<span class="c"># Clawpay generates:</span>
+<span class="k">trigger:</span> webhook/loan-apply
+<span class="k">steps:</span>
+  - <span class="k">verify:</span> smartocr/aadhaar
+  - <span class="k">verify:</span> facematch
+  - <span class="k">rule:</span> cibil_score > <span class="v">680</span>
+  - <span class="k">allocate:</span>
+      bank_a: <span class="v">80%</span>
+      nbfc_b: <span class="v">20%</span>
+  - <span class="k">execute:</span> cashfree/payouts</div>
+      </div>
+    </div>
+    <div>
+      <div class="card mb-16">
+        <h3 class="hi">Three-Layer Architecture</h3>
+        <div class="card-s bl-cyan mt-12 mb-8">
+          <p class="sm"><strong class="cy">Trigger Layer</strong> &mdash; Webhooks, schedules, form submissions, API events, doc uploads</p>
+        </div>
+        <div class="card-s bl-accent mb-8">
+          <p class="sm"><strong class="hi">Rule Engine</strong> &mdash; Eligibility, allocation, risk, compliance, workflow routing, retry &amp; fallback. DAG-based. No-code visual builder. Maker-checker.</p>
+        </div>
+        <div class="card-s bl-green">
+          <p class="sm"><strong class="gr">Action Layer (Cashfree)</strong> &mdash; SmartOCR, FaceMatch, Liveness, Payment Links, Forms, Payouts, Bank Verify, PG</p>
+        </div>
+      </div>
+      <div class="card bl-green">
+        <h3 class="gr">Simulation Engine</h3>
+        <p class="sub-s mt-8">Test any flow with mock data. No API keys. No sandbox account. No onboarding call.</p>
+        <div class="code mt-12" style="font-size:12px;padding:14px;"><span class="k">$</span> docker pull clawpay/gateway
+<span class="k">$</span> docker-compose up -d
+<span class="c"># Open browser &rarr; Build flow &rarr; Simulate &rarr; Deploy</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S10: RUNTIME ECONOMICS — Why not LLM per action -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" data-s="arch">
+  <p class="label">Why this architecture wins</p>
+  <h2>Razorpay runs Claude on every action. Clawpay runs deterministic rules at zero token cost.</h2>
+  <div class="g2 mt-24">
+    <div class="card bl-amber">
+      <h3 class="am">Razorpay Agent Studio</h3>
+      <p class="sub-s mt-12">Every agent action runs through Claude Agent SDK. Observe &rarr; Reason &rarr; Execute loop. Great for low-volume merchant tasks (50 cart recoveries/day).</p>
+      <div class="card-s mt-16" style="background:var(--amber-dim);">
+        <p class="sm"><strong>Token cost per action.</strong> Scales with usage volume. For a bank running continuous monitoring on 10M accounts, the LLM cost would be astronomical.</p>
+      </div>
+    </div>
+    <div class="card bl-green">
+      <h3 class="gr">Clawpay</h3>
+      <p class="sub-s mt-12">Rules are deterministic code, not LLM calls. AI is only used for config generation (one-time) and edge-case routing (1% of decisions).</p>
+      <div class="card-s mt-16" style="background:var(--green-dim);">
+        <p class="sm"><strong>Zero token cost at runtime.</strong> 99% of decisions are deterministic rules. AI touches config generation + edge cases only. Scales to millions of accounts.</p>
+      </div>
+    </div>
+  </div>
+  <div class="callout mt-24">
+    <p class="sm"><strong>The right AI architecture for finance:</strong> AI generates the workflow (high value, one-time cost). Deterministic rules execute the workflow (zero cost, infinite scale). AI audits edge cases (low volume, high value). This is bank-grade.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S11: MARKET SIZE -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" data-s="market">
+  <p class="label">Market</p>
+  <h2>$19B decision management TAM. India&rsquo;s digital lending alone is $133B by 2030.</h2>
+  <div class="g4 mt-24 mb-24">
+    <div class="stat"><div class="n sm-n hi">$19.3B</div><div class="l">Decision Management<br>TAM by 2032</div></div>
+    <div class="stat"><div class="n sm-n gr">$133B</div><div class="l">India digital lending<br>revenue by 2030</div></div>
+    <div class="stat"><div class="n sm-n am">87%</div><div class="l">India fintech<br>adoption rate</div></div>
+    <div class="stat"><div class="n sm-n cy">45%</div><div class="l">of 2024 funding went<br>to BFSI SaaS infra</div></div>
+  </div>
+  <div class="g2">
+    <div>
+      <h3 class="mb-12">On-Prem Gap &mdash; Confirmed by Research</h3>
+      <table>
+        <tr><th>Vendor</th><th>On-Prem?</th></tr>
+        <tr><td>IDfy</td><td><span class="cx">&cross;</span> <span class="dim sm">&ldquo;Cannot integrate with on-premise&rdquo;</span></td></tr>
+        <tr><td>HyperVerge</td><td><span class="cw">?</span> <span class="dim sm">Not publicly confirmed</span></td></tr>
+        <tr><td>Signzy</td><td><span class="cw">?</span> <span class="dim sm">Not publicly confirmed</span></td></tr>
+        <tr><td>Lentra</td><td><span class="cx">&cross;</span> <span class="dim sm">Cloud-only</span></td></tr>
+        <tr><td>Perfios</td><td><span class="ck">&check;</span> <span class="dim sm">Yes, but no execution layer</span></td></tr>
+        <tr><td><strong>Clawpay</strong></td><td><span class="ck">&check;</span> <strong class="gr">Docker-first. BRE + Execute + Verify.</strong></td></tr>
+      </table>
+    </div>
+    <div>
+      <h3 class="mb-12">Post-Juspay Orchestration Vacuum</h3>
+      <ul class="bl">
+        <li>PhonePe, Razorpay, Cashfree, Paytm all cut ties with Juspay (Dec 2024 &ndash; Apr 2025)</li>
+        <li>Juspay open-sourced Hyperswitch (40K GitHub stars) &mdash; but only payment routing</li>
+        <li><strong>Nobody is doing for verify &rarr; decide &rarr; execute what Hyperswitch did for payment routing</strong></li>
+      </ul>
+      <div class="card-s bl-green mt-16">
+        <p class="sm"><strong>BRE adoption is proving ROI:</strong> Oxyzo reported 30% underwriting reduction + 40% ops improvement. PwC: BRE lead filtering cuts CAC by ~30%.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S12: COMPETITION TABLE -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" data-s="vs">
+  <p class="label">Competition</p>
+  <h2>Every incumbent has a gap. Clawpay fills all of them.</h2>
+  <div class="mt-20" style="overflow-x:auto;">
+    <table>
+      <tr><th></th><th style="color:var(--accent-light)">Clawpay</th><th>Razorpay<br>Agent Studio</th><th>HyperVerge</th><th>Lentra</th><th>Perfios</th></tr>
+      <tr><td><strong>Focus</strong></td><td>Pre-txn compliance &amp; execution</td><td>Post-txn intelligence</td><td>Identity verification</td><td>Lending platform</td><td>Data aggregation</td></tr>
+      <tr><td><strong>Verify</strong></td><td><span class="ck">&check;</span> Cashfree native</td><td><span class="cx">&cross;</span> None</td><td><span class="ck">&check;</span> World-class</td><td><span class="cx">&cross;</span></td><td><span class="cw">~</span></td></tr>
+      <tr><td><strong>Decide</strong></td><td><span class="ck">&check;</span> Full DAG BRE</td><td><span class="cw">~</span> LLM reasoning</td><td><span class="cw">~</span> Linear builder</td><td><span class="ck">&check;</span> Lending-only</td><td><span class="cw">~</span></td></tr>
+      <tr><td><strong>Execute</strong></td><td><span class="ck">&check;</span> PG + Payouts</td><td><span class="ck">&check;</span> PG + Payouts</td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td></tr>
+      <tr><td><strong>Allocate</strong></td><td><span class="ck">&check;</span> Splits, escrow</td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td></tr>
+      <tr><td><strong>On-Prem</strong></td><td><span class="ck">&check;</span> Docker, hours</td><td><span class="cx">&cross;</span> Cloud-only</td><td><span class="cw">?</span></td><td><span class="cx">&cross;</span></td><td><span class="ck">&check;</span></td></tr>
+      <tr><td><strong>AI Model</strong></td><td>Rules + AI parser</td><td>Claude Agent SDK</td><td>Proprietary ML</td><td>Proprietary</td><td>Proprietary</td></tr>
+      <tr><td><strong>Runtime Cost</strong></td><td style="color:var(--green)">Zero tokens</td><td style="color:var(--amber)">Tokens per action</td><td>Per API call</td><td>License</td><td>License</td></tr>
+      <tr><td><strong>Open Source</strong></td><td><span class="ck">&check;</span> MIT core</td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td></tr>
+      <tr><td><strong>Revenue</strong></td><td>&mdash;</td><td>Within Razorpay</td><td>&#8377;149 Cr</td><td>&#8377;217 Cr</td><td>&#8377;709 Cr</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S13: RAZORPAY POSITIONING — Different moments -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" data-s="vs">
+  <p class="label">Positioning</p>
+  <h2>Razorpay owns post-transaction. Clawpay owns pre-transaction. Different moments.</h2>
+  <div class="g2 mt-24">
+    <div>
+      <div class="card bl-amber mb-16">
+        <h3 class="am">Razorpay Agent Studio</h3>
+        <p class="sub-s mt-8">Dispute recovery, cart conversion, subscription retry, cashflow forecast, RTO prevention, settlement insights.</p>
+        <p class="sm dim mt-12">All operate <strong>after</strong> the core transaction. Post-payment intelligence.</p>
+      </div>
+      <div class="card bl-accent">
+        <h3 class="hi">Clawpay Agents</h3>
+        <p class="sub-s mt-8">KYC verification, eligibility decisioning, co-lending allocation, autonomous disbursement, continuous monitoring.</p>
+        <p class="sm dim mt-12">All operate <strong>before</strong> money moves. Pre-transaction compliance &amp; execution.</p>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <div class="card glow">
+        <p class="sm dim mb-8">CUSTOMER JOURNEY</p>
+        <div class="flow gap-12" style="flex-direction:column;align-items:stretch;">
+          <div class="card-s" style="background:var(--accent-glow-strong);border-color:var(--accent);text-align:center;">
+            <p class="sm bold hi">CLAWPAY</p>
+            <p class="xs dim">Identity &rarr; Onboarding &rarr; Verify &rarr; Decide &rarr; Allocate &rarr; Execute</p>
+          </div>
+          <div style="text-align:center;"><span class="dim">&darr; money moves &darr;</span></div>
+          <div class="card-s" style="background:var(--amber-dim);border-color:rgba(255,214,10,.3);text-align:center;">
+            <p class="sm bold am">RAZORPAY AGENT STUDIO</p>
+            <p class="xs dim">Disputes &rarr; Recovery &rarr; Forecast &rarr; RTO &rarr; Insights</p>
+          </div>
+        </div>
+        <p class="sm mt-16 center" style="font-weight:600;">Together they cover the full lifecycle.<br>But they don&rsquo;t compete.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S14: BUILD PLAN -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide" data-s="build">
+  <p class="label">Build plan</p>
+  <h2>Ship 3 agents first. Open-source the core when traction proves demand.</h2>
+  <div class="g2 mt-24">
+    <div>
+      <div class="tl-item">
+        <span class="tag t-green mb-8">Phase 1 &mdash; Q2 2026</span>
+        <h3>Compliance Agent MVP</h3>
+        <p class="sub-s mt-4">AI parser + YAML workflow spec + simulation engine + Cashfree rail mapping. One NBFC design partner. Pre-built templates from KYC Journey library.</p>
+      </div>
+      <div class="tl-item">
+        <span class="tag t-accent mb-8">Phase 2 &mdash; Q3 2026</span>
+        <h3>Allocation Agent + Templates</h3>
+        <p class="sub-s mt-4">Co-lending splits, escrow, TDS. Pre-built flow templates: Loan Disbursal, Gig Onboarding, Vendor Payout. 2&ndash;3 horizontal customers.</p>
+      </div>
+      <div class="tl-item">
+        <span class="tag t-accent mb-8">Phase 3 &mdash; Q4 2026</span>
+        <h3>Monitoring Agent + ClawPay Hub</h3>
+        <p class="sub-s mt-4">Continuous monitoring, mule detection, dynamic trust scoring. Community template marketplace (Cashfree-certified). Open-source core on GitHub (MIT).</p>
+      </div>
+      <div class="tl-item">
+        <span class="tag t-amber mb-8">Phase 4 &mdash; 2027</span>
+        <h3>Enterprise On-Prem + Bank-Grade</h3>
+        <p class="sub-s mt-4">Top 25 banks. ISO 27001. CISO-ready docs. Air-gapped Docker deployment. Full V-CIP compliance architecture.</p>
+      </div>
+    </div>
+    <div>
+      <h3 class="mb-16">Bank-Grade Security (Day One)</h3>
+      <div class="card mb-16">
+        <ul class="bl sm">
+          <li><strong>RBAC:</strong> Rule creator &ne; approver &ne; deployer</li>
+          <li><strong>Maker-checker:</strong> 4-eyes mandatory on every rule change</li>
+          <li><strong>Immutable audit:</strong> Cryptographically signed execution logs</li>
+          <li><strong>Sandboxed templates:</strong> Community flows never touch production without review</li>
+          <li><strong>Zero data egress:</strong> All processing containerized locally</li>
+        </ul>
+      </div>
+      <h3 class="mb-16">Pricing Model</h3>
+      <div class="card-s bl-green mb-8"><p class="sm"><strong class="gr">Open Core</strong> &mdash; Free (MIT). Rule engine, simulation, YAML config. Self-hosted.</p></div>
+      <div class="card-s bl-accent mb-8"><p class="sm"><strong class="hi">Cloud Managed</strong> &mdash; Usage-based per rule execution. Cashfree-native actions included.</p></div>
+      <div class="card-s bl-amber"><p class="sm"><strong class="am">Enterprise On-Prem</strong> &mdash; Annual license + support. Docker on-prem. Air-gapped.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- S15: CTA — Closing -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="slide mid" data-s="build">
+  <div class="logo mb-24" style="font-size:36px;"><span class="c">Claw</span>pay</div>
+  <h1>Your rules. Your money.<br>Your <span class="gr">infra</span>.</h1>
+  <p class="sub mb-32">
+    Razorpay Agent Studio recovers revenue after the transaction.<br>
+    Clawpay agents ensure compliance before the transaction.<br>
+    <strong>Different moments. Same AI-native approach.</strong>
+  </p>
+  <div class="g3 mt-8" style="max-width:640px;margin:0 auto;">
+    <div class="stat"><div class="n sm-n">Hours</div><div class="l">to deploy</div></div>
+    <div class="stat"><div class="n sm-n gr">100%</div><div class="l">of the loop closed</div></div>
+    <div class="stat"><div class="n sm-n hi">MIT</div><div class="l">open-core</div></div>
+  </div>
+  <div class="flex gap-16 mt-32" style="justify-content:center;">
+    <span class="tag t-accent" style="font-size:13px;padding:6px 16px;">Star the Repo</span>
+    <span class="tag t-green" style="font-size:13px;padding:6px 16px;">Pull the Docker Image</span>
+    <span class="tag t-cyan" style="font-size:13px;padding:6px 16px;">Build Your First Flow</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- NAV -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="nav">
+  <button onclick="go(-1)">&larr;</button>
+  <div class="ct" id="ct">1 / 15</div>
+  <button onclick="go(1)">&rarr;</button>
+</div>
+
+<script>
+const S=document.querySelectorAll('.slide'),P=document.getElementById('progress'),
+C=document.getElementById('ct'),SP=document.querySelectorAll('#signpost span');
+let i=0;
+function show(n){S[i].classList.remove('active');i=Math.max(0,Math.min(n,S.length-1));
+S[i].classList.add('active');C.textContent=`${i+1} / ${S.length}`;
+P.style.width=`${(i+1)/S.length*100}%`;
+const s=S[i].dataset.s;SP.forEach(x=>x.classList.toggle('active',x.dataset.s===s));}
+function go(d){show(i+d);}
+document.addEventListener('keydown',e=>{
+if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(1);}
+if(e.key==='ArrowLeft'){e.preventDefault();go(-1);}
+if(e.key==='Home'){e.preventDefault();show(0);}
+if(e.key==='End'){e.preventDefault();show(S.length-1);}});
+let ts=0;
+document.addEventListener('touchstart',e=>{ts=e.touches[0].clientX;});
+document.addEventListener('touchend',e=>{const d=ts-e.changedTouches[0].clientX;if(Math.abs(d)>60)go(d>0?1:-1);});
+show(0);
+</script>
+</body>
+</html>
