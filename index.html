@@ -3,728 +3,436 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clawpay | AI Agents for Compliance, Lending &amp; Money Movement</title>
-<meta name="description" content="The open-core financial operations engine. AI agents that verify, decide, allocate, and execute before money moves.">
+<title>Clawpay + Cashfree AI Studio</title>
+<meta name="description" content="AI agents across every Cashfree product. Open-core engine + commercial platform. Agentic Commerce and Payments Innovation.">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+  /* Refactoring UI: Define systems in advance. Constrained spacing scale. */
   :root {
-    --bg: #08080d;
-    --surface: #111118;
-    --surface-2: #1a1a24;
-    --surface-3: #222233;
-    --border: #2a2a3d;
-    --text: #eeeef2;
-    --text-2: #b0b0c0;
-    --text-3: #707088;
-    --accent: #635bff;
-    --accent-light: #8b85ff;
-    --accent-glow: rgba(99, 91, 255, 0.12);
-    --accent-glow-strong: rgba(99, 91, 255, 0.25);
-    --green: #30d158;
-    --green-dim: rgba(48, 209, 88, 0.10);
-    --red: #ff453a;
-    --red-dim: rgba(255, 69, 58, 0.10);
-    --amber: #ffd60a;
-    --amber-dim: rgba(255, 214, 10, 0.08);
-    --cyan: #64d2ff;
-    --cyan-dim: rgba(100, 210, 255, 0.10);
+    --s-4: 4px; --s-8: 8px; --s-12: 12px; --s-16: 16px;
+    --s-24: 24px; --s-32: 32px; --s-48: 48px; --s-64: 64px;
+    --s-96: 96px; --s-128: 128px;
+
+    --bg: #09090b;
+    --s1: #18181b;    /* surface 1 */
+    --s2: #27272a;    /* surface 2 */
+    --b: #3f3f46;     /* border */
+    --t1: #fafafa;    /* primary text */
+    --t2: #a1a1aa;    /* secondary text */
+    --t3: #71717a;    /* tertiary text */
+    --accent: #818cf8; /* indigo-400 */
+    --green: #4ade80;
+    --red: #f87171;
+    --amber: #fbbf24;
+    --cyan: #22d3ee;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overflow: hidden;
-    height: 100vh;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg); color: var(--t1);
+    overflow: hidden; height: 100vh;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ─── Slide system ─── */
-  .slide {
-    position: absolute;
-    inset: 0;
-    display: none;
-    flex-direction: column;
-    padding: 56px 80px 56px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--surface-3) transparent;
-  }
-  .slide.active { display: flex; }
+  /* Slides */
+  .sl { position: absolute; inset: 0; display: none; flex-direction: column; overflow-y: auto; }
+  .sl.on { display: flex; }
 
-  /* ─── Progress ─── */
-  #progress {
-    position: fixed; top: 0; left: 0; height: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
-    transition: width .35s ease; z-index: 200;
-  }
+  /* Refactoring UI: Start with too much white space. */
+  .sl { padding: var(--s-96) var(--s-128); }
+  .sl.center { justify-content: center; align-items: center; text-align: center; }
 
-  /* ─── Signpost ─── */
-  #signpost {
-    position: fixed; top: 14px; right: 32px;
-    display: flex; gap: 5px; z-index: 200;
-  }
-  #signpost span {
-    font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
-    padding: 3px 10px; border-radius: 100px;
-    background: var(--surface-2); border: 1px solid var(--border); color: var(--text-3);
-    transition: all .2s;
-  }
-  #signpost span.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  /* Progress */
+  #bar { position: fixed; top: 0; left: 0; height: 2px; background: var(--accent); transition: width .3s; z-index: 99; }
 
-  /* ─── Nav ─── */
-  .nav {
-    position: fixed; bottom: 20px; right: 28px;
-    display: flex; gap: 6px; align-items: center; z-index: 200;
-  }
-  .nav button {
-    width: 36px; height: 36px; border-radius: 8px;
-    background: var(--surface-2); border: 1px solid var(--border);
-    color: var(--text); font-size: 14px; cursor: pointer;
-    transition: all .15s; display: grid; place-items: center;
-  }
-  .nav button:hover { background: var(--accent); border-color: var(--accent); }
-  .nav .ct { font-size: 11px; color: var(--text-3); min-width: 48px; text-align: center; font-variant-numeric: tabular-nums; }
+  /* Nav */
+  .nav { position: fixed; bottom: var(--s-24); right: var(--s-32); display: flex; gap: var(--s-8); align-items: center; z-index: 99; }
+  .nav button { width: 36px; height: 36px; border-radius: 8px; background: var(--s1); border: 1px solid var(--b); color: var(--t2); cursor: pointer; font-size: 14px; }
+  .nav button:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .nav .c { font-size: 12px; color: var(--t3); min-width: 50px; text-align: center; }
 
-  /* ─── Typography ─── */
-  .label {
-    font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-    color: var(--accent-light); margin-bottom: 12px;
-  }
-  h1 { font-size: 52px; font-weight: 800; line-height: 1.08; letter-spacing: -.03em; margin-bottom: 20px; }
-  h2 { font-size: 36px; font-weight: 700; line-height: 1.15; letter-spacing: -.02em; margin-bottom: 16px; }
-  h3 { font-size: 20px; font-weight: 700; line-height: 1.3; margin-bottom: 8px; }
-  .sub { font-size: 20px; color: var(--text-2); line-height: 1.55; max-width: 680px; }
-  .sub-s { font-size: 16px; color: var(--text-2); line-height: 1.55; }
-  .hi { color: var(--accent-light); }
+  /* Section pills - minimal, not competing */
+  #pills { position: fixed; top: var(--s-16); right: var(--s-32); display: flex; gap: var(--s-4); z-index: 99; }
+  #pills span { font-size: 10px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 3px 8px; border-radius: 99px; color: var(--t3); background: transparent; }
+  #pills span.on { color: var(--t1); background: var(--s2); }
+
+  /* Refactoring UI: Hierarchy is everything. Size + weight + color. */
+  /* Primary: large, heavy, full color. Secondary: smaller, lighter weight, muted. Tertiary: smallest, lightest. */
+  .kicker { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: var(--s-16); }
+  h1 { font-size: 56px; font-weight: 800; line-height: 1.05; letter-spacing: -.035em; color: var(--t1); }
+  h2 { font-size: 36px; font-weight: 700; line-height: 1.15; letter-spacing: -.02em; color: var(--t1); }
+  h3 { font-size: 18px; font-weight: 600; color: var(--t1); }
+  .lead { font-size: 20px; font-weight: 400; color: var(--t2); line-height: 1.6; max-width: 640px; margin-top: var(--s-16); }
+  .body { font-size: 15px; color: var(--t2); line-height: 1.6; }
+  .note { font-size: 13px; color: var(--t3); line-height: 1.5; }
+  .hi { color: var(--accent); }
   .gr { color: var(--green); }
   .rd { color: var(--red); }
   .am { color: var(--amber); }
-  .cy { color: var(--cyan); }
-  .dim { color: var(--text-3); }
-  .sm { font-size: 13px; }
-  .xs { font-size: 11px; }
-  .mono { font-family: 'JetBrains Mono', monospace; }
-  .bold { font-weight: 700; }
-  .center { text-align: center; }
 
-  /* ─── Layout helpers ─── */
-  .mid { justify-content: center; align-items: center; text-align: center; }
-  .mid .sub { margin: 0 auto; }
-  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
-  .g4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; }
-  .flex { display: flex; }
-  .flex-1 { flex: 1; }
-  .gap-12 { gap: 12px; }
-  .gap-16 { gap: 16px; }
-  .gap-24 { gap: 24px; }
-  .mt-8 { margin-top: 8px; } .mt-12 { margin-top: 12px; } .mt-16 { margin-top: 16px; }
-  .mt-20 { margin-top: 20px; } .mt-24 { margin-top: 24px; } .mt-32 { margin-top: 32px; }
-  .mb-8 { margin-bottom: 8px; } .mb-12 { margin-bottom: 12px; } .mb-16 { margin-bottom: 16px; }
-  .mb-24 { margin-bottom: 24px; } .mb-32 { margin-bottom: 32px; }
+  /* Layout - Refactoring UI: Don't fill the whole screen. Give each element the space it needs. */
+  .row { display: flex; gap: var(--s-48); }
+  .col { flex: 1; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-32); }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s-24); }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: var(--s-24); }
 
-  /* ─── Cards ─── */
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
-  .card-s { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; }
-  .card.glow { border-color: var(--accent); background: linear-gradient(135deg, var(--accent-glow) 0%, var(--surface) 100%); }
-  .bl-accent { border-left: 3px solid var(--accent); }
-  .bl-green { border-left: 3px solid var(--green); }
-  .bl-red { border-left: 3px solid var(--red); }
-  .bl-amber { border-left: 3px solid var(--amber); }
-  .bl-cyan { border-left: 3px solid var(--cyan); }
+  /* Cards - Refactoring UI: Emphasize by de-emphasizing. Cards are containers, not decoration. */
+  .card { background: var(--s1); border: 1px solid var(--b); border-radius: 12px; padding: var(--s-24); }
+  .card.accent { border-color: rgba(129,140,248,.3); background: rgba(129,140,248,.05); }
+  .card.minimal { background: transparent; border: none; padding: 0; }
 
-  /* ─── Stats ─── */
-  .stat { text-align: center; }
-  .stat .n { font-size: 48px; font-weight: 800; line-height: 1; letter-spacing: -.02em; }
-  .stat .n.sm-n { font-size: 36px; }
-  .stat .l { font-size: 13px; color: var(--text-3); margin-top: 6px; line-height: 1.4; }
+  /* Stat - Refactoring UI: Labels are a last resort. Let the number speak. */
+  .stat-num { font-size: 48px; font-weight: 800; letter-spacing: -.02em; line-height: 1; }
+  .stat-label { font-size: 13px; color: var(--t3); margin-top: var(--s-8); }
 
-  /* ─── Tags ─── */
-  .tag {
-    display: inline-block; padding: 3px 10px; border-radius: 100px;
-    font-size: 11px; font-weight: 700; letter-spacing: .04em;
-  }
-  .tag.t-accent { background: var(--accent-glow); color: var(--accent-light); }
-  .tag.t-green { background: var(--green-dim); color: var(--green); }
-  .tag.t-red { background: var(--red-dim); color: var(--red); }
-  .tag.t-amber { background: var(--amber-dim); color: var(--amber); }
-  .tag.t-cyan { background: var(--cyan-dim); color: var(--cyan); }
-
-  /* ─── Tables ─── */
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th {
-    text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .06em; color: var(--text-3);
-    border-bottom: 1px solid var(--border);
-  }
-  td { padding: 9px 12px; border-bottom: 1px solid rgba(42,42,61,.4); vertical-align: top; }
+  /* Table - Refactoring UI: Give elements room to breathe. */
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: var(--s-12) var(--s-16); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--t3); border-bottom: 1px solid var(--b); }
+  td { padding: var(--s-12) var(--s-16); font-size: 14px; color: var(--t2); border-bottom: 1px solid rgba(63,63,70,.4); }
+  td:first-child { color: var(--t1); font-weight: 500; }
   tr:last-child td { border-bottom: none; }
-  .ck { color: var(--green); } .cx { color: var(--red); opacity:.7; } .cw { color: var(--amber); }
+  .ck { color: var(--green); } .cx { color: var(--t3); }
 
-  /* ─── Code ─── */
-  .code {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-    padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px;
-    line-height: 1.75; white-space: pre; overflow-x: auto;
-  }
-  .code .c { color: var(--text-3); } .code .k { color: var(--accent-light); }
-  .code .s { color: var(--green); } .code .v { color: var(--amber); }
+  /* Agent list - compact but breathable */
+  .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-12); }
+  .agent-item { padding: var(--s-12) var(--s-16); background: var(--s1); border-radius: 8px; border: 1px solid var(--b); }
+  .agent-item h4 { font-size: 14px; font-weight: 600; color: var(--t1); margin-bottom: var(--s-4); }
+  .agent-item p { font-size: 12px; color: var(--t3); line-height: 1.4; }
 
-  /* ─── Flow ─── */
-  .flow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .fs {
-    background: var(--surface-2); border: 1px solid var(--border); padding: 6px 14px;
-    border-radius: 8px; font-size: 13px; font-weight: 600;
-  }
-  .fs.active { background: var(--accent-glow-strong); border-color: var(--accent); color: var(--accent-light); }
-  .fa { color: var(--text-3); font-size: 16px; }
+  /* Flow */
+  .flow { display: flex; align-items: center; gap: var(--s-8); flex-wrap: wrap; }
+  .flow-step { padding: var(--s-8) var(--s-16); border-radius: 8px; font-size: 13px; font-weight: 500; background: var(--s1); border: 1px solid var(--b); color: var(--t2); }
+  .flow-step.active { border-color: var(--accent); color: var(--accent); background: rgba(129,140,248,.08); }
+  .flow-arr { color: var(--t3); }
 
-  /* ─── Callout ─── */
-  .callout {
-    background: var(--accent-glow); border: 1px solid rgba(99,91,255,.3);
-    border-radius: 10px; padding: 16px 20px; font-size: 15px; line-height: 1.5;
-  }
+  /* Code */
+  .code { background: var(--s1); border: 1px solid var(--b); border-radius: 10px; padding: var(--s-24); font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; white-space: pre; overflow-x: auto; color: var(--t2); }
 
-  /* ─── Bullets ─── */
-  .bl { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-  .bl li { padding-left: 18px; position: relative; font-size: 15px; line-height: 1.5; }
-  .bl li::before {
-    content: ''; position: absolute; left: 0; top: 8px;
-    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
-  }
+  /* Spacing helpers */
+  .mt-8 { margin-top: var(--s-8); }   .mt-16 { margin-top: var(--s-16); }
+  .mt-24 { margin-top: var(--s-24); } .mt-32 { margin-top: var(--s-32); }
+  .mt-48 { margin-top: var(--s-48); } .mt-64 { margin-top: var(--s-64); }
+  .mb-16 { margin-bottom: var(--s-16); } .mb-24 { margin-bottom: var(--s-24); }
+  .mb-32 { margin-bottom: var(--s-32); } .mb-48 { margin-bottom: var(--s-48); }
 
-  /* ─── Timeline ─── */
-  .tl-item { position: relative; padding-left: 28px; padding-bottom: 20px; }
-  .tl-item::before {
-    content: ''; position: absolute; left: 8px; top: 8px; bottom: 0;
-    width: 1px; background: var(--border);
-  }
-  .tl-item:last-child::before { display: none; }
-  .tl-item::after {
-    content: ''; position: absolute; left: 4px; top: 6px;
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--accent); border: 2px solid var(--bg);
-  }
-
-  /* ─── Logo ─── */
-  .logo { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
-  .logo .c { color: var(--accent-light); }
-
-  /* ─── Responsive ─── */
   @media (max-width: 1024px) {
-    .slide { padding: 32px 36px; }
-    h1 { font-size: 36px; } h2 { font-size: 28px; }
-    .g2, .g3, .g4 { grid-template-columns: 1fr; }
+    .sl { padding: var(--s-48) var(--s-32); }
+    h1 { font-size: 36px; }
+    h2 { font-size: 28px; }
+    .grid-2, .grid-3, .grid-4, .row { display: flex; flex-direction: column; gap: var(--s-24); }
+    .agent-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
-<div id="progress"></div>
-<div id="signpost">
-  <span data-s="open">Context</span>
-  <span data-s="gap">The Gap</span>
-  <span data-s="agents">41 Agents</span>
-  <span data-s="arch">Architecture</span>
-  <span data-s="market">Market</span>
-  <span data-s="vs">Strategy</span>
-  <span data-s="build">Build</span>
+<div id="bar"></div>
+<div id="pills">
+  <span data-s="ctx">Context</span>
+  <span data-s="gap">Gap</span>
+  <span data-s="sol">Solution</span>
+  <span data-s="agents">Agents</span>
+  <span data-s="how">How</span>
+  <span data-s="mkt">Market</span>
+  <span data-s="strat">Strategy</span>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S1: TITLE -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide mid active" data-s="open">
-  <div class="flex gap-24 mb-32" style="justify-content:center;align-items:center;">
-    <div class="logo"><span class="c">Claw</span>pay</div>
-    <span class="dim">+</span>
-    <div class="logo"><span class="gr">Cashfree</span> AI Studio</div>
-  </div>
-  <h1>41 AI agents across every<br><span class="hi">Cashfree product</span></h1>
-  <p class="sub mb-32">Clawpay = open-source engine (MIT). Cashfree AI Studio = commercial product.<br>Clawpay sets the standard. AI Studio monetizes it. Two layers. One vision.</p>
-  <div class="flex gap-24" style="justify-content:center;">
-    <span class="tag t-accent">Clawpay: Open-Core (MIT)</span>
-    <span class="tag t-green">Cashfree AI Studio: Commercial</span>
-    <span class="tag t-cyan">41 Agents, 39 Products</span>
-  </div>
-  <p class="dim xs mt-32">Agentic Commerce &amp; Payments Innovation &middot; March 2026</p>
+<!-- ══════════════════════════════════════════════ -->
+<!-- 1. TITLE -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl center on" data-s="ctx">
+  <p class="note mb-24">Agentic Commerce &amp; Payments Innovation</p>
+  <h1 style="max-width:800px;"><span class="hi">Clawpay</span> + Cashfree AI Studio</h1>
+  <p class="lead" style="margin:var(--s-24) auto 0;">AI agents across every Cashfree product.<br>Open-source engine. Commercial platform. Two layers.</p>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S2: SITUATION -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide mid" data-s="open">
-  <p class="label">Something just shifted</p>
-  <h1>Razorpay built AI agents<br>for <span class="am">after</span> money moves.</h1>
-  <p class="sub mb-32">Agent Studio. 8 agents. Disputes, cart recovery, RTO, cashflow. Built on Claude. Launched at FTX&rsquo;26. The market gets it now.</p>
-  <p class="sub" style="font-size:24px;color:var(--text);max-width:600px;font-weight:600;">
-    &ldquo;Without us, AI just talks; with us, it transacts.&rdquo;<br>
-    <span class="dim sm">/ Harshil Mathur, CEO Razorpay</span>
-  </p>
+<!-- ══════════════════════════════════════════════ -->
+<!-- 2. RAZORPAY CONTEXT -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl center" data-s="ctx">
+  <p class="kicker">What just happened</p>
+  <h1 style="max-width:700px;">Razorpay shipped 8 AI agents.<br>All <span class="am">post-transaction</span>.</h1>
+  <p class="lead" style="margin:var(--s-24) auto 0;">Agent Studio. Built on Claude. Disputes, cart recovery, RTO, cashflow. Launched FTX&rsquo;26. The market now understands AI agents on payment rails.</p>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S3: COMPLICATION -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide mid" data-s="gap">
-  <p class="label">But here&rsquo;s the gap</p>
-  <h1>Nobody built agents<br>for <span class="rd">before</span> money moves.</h1>
-  <p class="sub">Verify identity. Check eligibility. Calculate splits. Disburse. Comply with RBI. Right now this takes 4-6 vendors, Excel sheets, and 3+ days of someone manually pushing buttons.</p>
+<!-- ══════════════════════════════════════════════ -->
+<!-- 3. THE GAP -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl center" data-s="gap">
+  <p class="kicker">The gap</p>
+  <h1 style="max-width:700px;">Nobody built agents for<br><span class="rd">before</span> money moves.</h1>
+  <p class="lead" style="margin:var(--s-24) auto 0;">Verify. Decide. Allocate. Disburse. Comply. Today: 4-6 vendors, Excel, 3+ days of manual ops.</p>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S4: DATA -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide" data-s="gap">
-  <p class="label">The evidence</p>
-  <h2>This isn&rsquo;t theoretical. RBI is already fining people.</h2>
-  <div class="g3 mt-24 mb-32">
-    <div class="stat"><div class="n rd">62</div><div class="l">NBFCs penalized by RBI<br>2023-2025</div></div>
-    <div class="stat"><div class="n rd">&nbsp;&#8377;250Cr</div><div class="l">Maximum penalty under<br>DPDP Act</div></div>
-    <div class="stat"><div class="n am">60%</div><div class="l">of onboarding costs<br>spent on KYC (BCG)</div></div>
-  </div>
-  <div class="g2">
-    <div class="card bl-red">
-      <h3>RBI CLA 2025 (Effective Jan 1, 2026)</h3>
-      <ul class="bl mt-12">
-        <li>Mandatory borrower-level escrow for every co-lending pair</li>
-        <li>15-day settlement deadline. Miss it, full loan stays with originator</li>
-        <li>Real-time NPA synchronization between co-lenders</li>
-        <li>NBFC minimum retention drops 20% &rarr; 10%, more complex math</li>
-      </ul>
+<!-- ══════════════════════════════════════════════ -->
+<!-- 4. EVIDENCE -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl" data-s="gap">
+  <p class="kicker">The evidence</p>
+  <h2>RBI is already fining people. This is not theoretical.</h2>
+  <div class="grid-3 mt-48">
+    <div>
+      <div class="stat-num rd">62</div>
+      <div class="stat-label">NBFCs penalized by RBI<br>2023 to 2025</div>
     </div>
-    <div class="card bl-red">
-      <h3>V-CIP On-Prem Mandate</h3>
-      <ul class="bl mt-12">
-        <li>Infrastructure <strong>must</strong> be on RE&rsquo;s premises</li>
-        <li>Third-party video platforms <strong>not permitted</strong></li>
-        <li>All data stored <strong>in India only</strong></li>
-        <li>No vendor offers containerized on-prem KYC + BRE + execution</li>
-      </ul>
+    <div>
+      <div class="stat-num rd">&#8377;250Cr</div>
+      <div class="stat-label">Maximum penalty<br>under DPDP Act</div>
+    </div>
+    <div>
+      <div class="stat-num am">60%</div>
+      <div class="stat-label">of onboarding costs<br>spent on KYC (BCG)</div>
+    </div>
+  </div>
+  <div class="grid-2 mt-48">
+    <div>
+      <h3 class="mb-16">RBI CLA 2025 (Jan 1, 2026)</h3>
+      <p class="body">Mandatory escrow per co-lending pair. 15-day settlement deadline. NPA sync required. NBFC retention drops to 10%. Most stacks aren't built for this.</p>
+    </div>
+    <div>
+      <h3 class="mb-16">V-CIP On-Prem Mandate</h3>
+      <p class="body">Infrastructure on RE's premises. Third-party video platforms not permitted. India-only data storage. No vendor offers containerized on-prem KYC + BRE + execution.</p>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S5: GAP TABLE -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide" data-s="gap">
-  <p class="label">The 5 gaps</p>
-  <h2>Every player stops somewhere. Nobody does the whole thing.</h2>
-  <div class="mt-20" style="overflow-x:auto;">
+<!-- ══════════════════════════════════════════════ -->
+<!-- 5. THE ANSWER -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl center" data-s="sol">
+  <p class="kicker">The answer</p>
+  <h1 style="max-width:800px;">Two layers.<br><span class="hi">Clawpay</span> sets the standard.<br><span class="gr">Cashfree AI Studio</span> monetizes it.</h1>
+  <p class="lead" style="margin:var(--s-24) auto 0;">Razorpay kept it proprietary. We open-source the engine.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 6. THE PLAYBOOK -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl" data-s="sol">
+  <p class="kicker">The playbook that creates category leaders</p>
+  <h2>Every infra company that won did the same thing.</h2>
+  <div style="max-width:700px;" class="mt-48">
     <table>
-      <tr><th style="width:18%">Gap</th><th style="width:38%">What happens today</th><th style="width:38%">What should happen</th></tr>
-      <tr><td><strong>Verify &rarr; Act</strong></td><td>KYC passes. Human initiates next step. <span class="tag t-red">3+ days</span></td><td>Verification triggers rule &rarr; money moves. <span class="tag t-green">4 seconds</span></td></tr>
-      <tr><td><strong>Rule &rarr; Execute</strong></td><td>BRE decides. Output goes to Excel.</td><td>Rule engine triggers Payout/PG via API. <span class="tag t-green">Zero human</span></td></tr>
-      <tr><td><strong>Allocate &rarr; Disburse</strong></td><td>Finance calculates splits in spreadsheet.</td><td>Allocation rules auto-calculate, auto-disburse.</td></tr>
-      <tr><td><strong>Comply &rarr; Audit</strong></td><td>Decisions logged across 4 systems.</td><td>Every execution immutably logged. <span class="tag t-green">Regulator-ready</span></td></tr>
-      <tr><td><strong>Cloud &rarr; On-Prem</strong></td><td>3-6 month implementation. Crores.</td><td><span class="tag t-green">Docker pull. Live in hours.</span></td></tr>
+      <tr><th>Company</th><th>Open Layer</th><th>Commercial Layer</th><th>Result</th></tr>
+      <tr><td>HashiCorp</td><td>Terraform</td><td>Terraform Cloud</td><td>$14B IPO</td></tr>
+      <tr><td>Elastic</td><td>Elasticsearch</td><td>Elastic Cloud</td><td>$4.6B IPO</td></tr>
+      <tr><td>MongoDB</td><td>MongoDB</td><td>Atlas</td><td>$30B+</td></tr>
+      <tr><td>Juspay</td><td>Hyperswitch</td><td>HyperPG</td><td>40K stars</td></tr>
+      <tr><td style="color:var(--accent)"><strong>Cashfree</strong></td><td><strong>Clawpay</strong></td><td style="color:var(--green)"><strong>AI Studio</strong></td><td></td></tr>
     </table>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S6: OPENCLAW CONTEXT -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide" data-s="open">
-  <p class="label">The precedent</p>
-  <h2>OpenClaw hit 250K stars in 100 days. Open-core agents work.</h2>
-  <div class="g2 mt-24">
-    <div>
-      <div class="g3 mb-24">
-        <div class="stat"><div class="n sm-n hi">250K</div><div class="l">GitHub stars<br>in ~100 days</div></div>
-        <div class="stat"><div class="n sm-n hi">47.7K</div><div class="l">Forks</div></div>
-        <div class="stat"><div class="n sm-n hi">1,075</div><div class="l">Contributors</div></div>
-      </div>
-      <div class="card-s bl-accent mb-12">
-        <p class="sm"><strong>Jensen Huang:</strong> &ldquo;Probably the single most important release of software&hellip; probably ever.&rdquo;</p>
-      </div>
-      <div class="card-s bl-accent mb-12">
-        <p class="sm"><strong>Sam Altman:</strong> Hired the creator. OpenClaw transitioned to an independent foundation.</p>
-      </div>
-      <div class="card-s bl-amber">
-        <p class="sm"><strong>Lesson:</strong> Anthropic sent lawyers. OpenAI sent a job offer. That tells you everything about how to treat builders.</p>
-      </div>
+<!-- ══════════════════════════════════════════════ -->
+<!-- 7. AGENT COUNT -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl center" data-s="agents">
+  <p class="kicker">The scale</p>
+  <h1>Razorpay: <span class="am">8</span> agents.<br>Cashfree: <span class="gr">35</span> agents.</h1>
+  <p class="lead" style="margin:var(--s-24) auto 0;">Pre-transaction. During transaction. Post-transaction. Full lifecycle. Every Cashfree product covered.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 8. AGENTS BY CATEGORY - PAYMENTS -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl" data-s="agents">
+  <p class="kicker">Payment &amp; Checkout Agents</p>
+  <h2 class="mb-48">9 agents that directly increase revenue and reduce fraud.</h2>
+  <div class="agent-grid">
+    <div class="agent-item"><h4>Payment Failure Diagnostics</h4><p>Instant root cause on every failed payment. WhatsApp alert with fix suggestion.</p></div>
+    <div class="agent-item"><h4>Smart Retry</h4><p>UPI timeout? Auto-generates retry link with next-best payment method. Avoids double charge.</p></div>
+    <div class="agent-item"><h4>FlowWise Routing</h4><p>Auto-routes to best gateway in real-time. Saves MDR. Improves success rate 8%.</p></div>
+    <div class="agent-item"><h4>RiskShield Fraud</h4><p>ML risk scoring + merchant rules. Blocks fraud without blocking good customers.</p></div>
+    <div class="agent-item"><h4>Dispute Shield</h4><p>Auto-submits chargeback evidence within 24 hours. Flips win rate from 20% to 50%.</p></div>
+    <div class="agent-item"><h4>One-Click Conversion</h4><p>Returning customers pay in one tap. Saved cards, UPI. 23% conversion lift.</p></div>
+    <div class="agent-item"><h4>Cart Recovery</h4><p>WhatsApp Payment Link 30 min after abandonment. Recovers 5-10% of lost carts.</p></div>
+    <div class="agent-item"><h4>Cashfree Here (Agentic Commerce)</h4><p>In-chat payments. No redirect. Browse, recommend, pay inside AI conversation.</p></div>
+    <div class="agent-item"><h4>EMI/BNPL Optimizer</h4><p>Checks eligibility across 15+ EMI issuers + BNPL. Shows best option on product page. AOV +34%.</p></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 9. AGENTS BY CATEGORY - MONEY MOVEMENT -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl" data-s="agents">
+  <p class="kicker">Money Movement Agents</p>
+  <h2 class="mb-48">7 agents that automate payouts, splits, refunds, and escrow.</h2>
+  <div class="agent-grid">
+    <div class="agent-item"><h4>Allocation Agent (Marketplace Splits)</h4><p>Multi-party splits, TDS, platform commission, escrow hold. Replaces Excel for split calculations.</p></div>
+    <div class="agent-item"><h4>Beneficiary Verification</h4><p>BAV before every payout. Catches wrong bank details + fraud. Saves 2-5% of failed transfers.</p></div>
+    <div class="agent-item"><h4>Payroll Autopilot</h4><p>Validates accounts via bulk BAV. Fires batch transfer. Handles failures + TDS. Monthly.</p></div>
+    <div class="agent-item"><h4>Instant Refund</h4><p>Instant for eligible transactions. Cashgram link for COD (don't know bank details).</p></div>
+    <div class="agent-item"><h4>Marketplace Split</h4><p>Auto-calculates vendor shares, commission, TDS. Disburses on each vendor's schedule.</p></div>
+    <div class="agent-item"><h4>Escrow Orchestrator</h4><p>OneEscrow per transaction. Holds until milestone. Auto-releases via Payouts.</p></div>
+    <div class="agent-item"><h4>RTO Guard + Insights</h4><p>Blocks high-risk COD. Converts to prepaid via Payment Link. Weekly pattern report.</p></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 10. AGENTS BY CATEGORY - VERIFY & COMPLY -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl" data-s="agents">
+  <p class="kicker">Verify, Comply &amp; Monitor Agents</p>
+  <h2 class="mb-48">10 agents for KYC, mule detection, credit, and continuous monitoring.</h2>
+  <div class="agent-grid">
+    <div class="agent-item"><h4>KYC Onboarding</h4><p>PAN + Aadhaar + FaceMatch + Liveness + BAV in one config. 30 seconds for low-risk.</p></div>
+    <div class="agent-item"><h4>Mule Detection</h4><p>Catches mule accounts that pass standard KYC. Device, geo, behavioral signals + T+1/T+7/T+30.</p></div>
+    <div class="agent-item"><h4>Re-KYC Enforcer</h4><p>Auto-triggers re-verification before expiry. WhatsApp nudges. Account restriction on lapse.</p></div>
+    <div class="agent-item"><h4>AML Case Manager</h4><p>Auto-triages 500 alerts/day. 75% false positive reduction. Audit-ready case files.</p></div>
+    <div class="agent-item"><h4>Sub-Merchant KYC</h4><p>Auto-validates merchant documents, PAN, GSTIN, bank account. Activation: 8 days to 2 hours.</p></div>
+    <div class="agent-item"><h4>Continuous Risk Monitoring</h4><p>Daily sanctions/PEP/mule dedup. Dynamic trust scoring. Auto-EDD triggers.</p></div>
+    <div class="agent-item"><h4>Dynamic Offer Optimizer</h4><p>Per-customer offer selection. No blanket discounts. Same conversion, lower cost.</p></div>
+    <div class="agent-item"><h4>Wallet Lifecycle</h4><p>Min-KYC to full-KYC upgrade nudges. Dormancy reactivation. Closure + fund repatriation.</p></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 11. AGENTS BY CATEGORY - RECURRING & OPS -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl" data-s="agents">
+  <p class="kicker">Recurring, Recon &amp; Ops Agents</p>
+  <h2 class="mb-48">12 agents for subscriptions, reconciliation, international, and field ops.</h2>
+  <div class="agent-grid">
+    <div class="agent-item"><h4>UPI Autopay Lifecycle</h4><p>Mandate activation nudges. Failure retry at optimal windows. WhatsApp re-authorize link.</p></div>
+    <div class="agent-item"><h4>eNACH/NACH Agent</h4><p>Mandate activation + failure fallback (eNACH &rarr; UPI Autopay &rarr; Physical NACH).</p></div>
+    <div class="agent-item"><h4>Mandate Reviver</h4><p>Recovers failed subscription payments. Retries + Cashgram fallback. 40-50% recovery rate.</p></div>
+    <div class="agent-item"><h4>Inward Reconciliation</h4><p>VBA per customer. Auto-matches payments by UTR. Eliminates manual bank statement matching.</p></div>
+    <div class="agent-item"><h4>CashRadar (Forecast)</h4><p>7-day rolling cash forecast. Inflows + outflows + settlements. Alerts before shortfall.</p></div>
+    <div class="agent-item"><h4>Daily Ledger</h4><p>Morning WhatsApp: yesterday's gross, fees, net settled, pending. No dashboard login.</p></div>
+    <div class="agent-item"><h4>CrossBorder Settlement</h4><p>FX rate tracking. Auto-uploads payment verification. Settlement delay diagnostics.</p></div>
+    <div class="agent-item"><h4>International Checkout</h4><p>DCC + Apple Pay + BIN-aware routing. 140+ currencies. Reduces intl declines.</p></div>
+    <div class="agent-item"><h4>Sub-Merchant Activator</h4><p>Auto-validates sub-merchant KYC. 56% auto-activated. Activation: 8 days to 2 hours.</p></div>
+    <div class="agent-item"><h4>Field Ops Monitor</h4><p>SoftPOS terminal health. Flags dormant devices. Daily settlement per store.</p></div>
+    <div class="agent-item"><h4>Bill Collection</h4><p>Pre-due reminders via WhatsApp + Payment Link. On-time collection: 70% to 89%.</p></div>
+    <div class="agent-item"><h4>Auto Collect Reconciler</h4><p>VBA per invoice. Auto-match by UTR. Triggers fulfillment on payment. Zero manual matching.</p></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 12. FEATURED USE CASE -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl" data-s="how">
+  <p class="kicker">How it works</p>
+  <h2 class="mb-32">Describe the flow in English. Clawpay wires it to Cashfree.</h2>
+  <div class="row">
+    <div class="col">
+      <div class="code"><span style="color:var(--t3)"># You say:</span>
+<span style="color:var(--green)">"Verify vendor PAN + GSTIN,
+ check bank account, split payment
+ 85% vendor / 15% platform,
+ deduct TDS, payout weekly"</span>
+
+<span style="color:var(--t3)"># Clawpay generates:</span>
+<span style="color:var(--accent)">trigger:</span> webhook/order-complete
+<span style="color:var(--accent)">steps:</span>
+  - <span style="color:var(--accent)">verify:</span> pan_360
+  - <span style="color:var(--accent)">verify:</span> gstin
+  - <span style="color:var(--accent)">verify:</span> bank_account
+  - <span style="color:var(--accent)">split:</span>
+      vendor: <span style="color:var(--amber)">85%</span>
+      platform: <span style="color:var(--amber)">15%</span>
+      tds: <span style="color:var(--amber)">auto</span>
+  - <span style="color:var(--accent)">execute:</span> cashfree/easy-split</div>
     </div>
-    <div>
-      <h3 class="mb-16">The playbook that creates leaders:</h3>
-      <table class="mt-8" style="font-size:13px;">
-        <tr><th>Company</th><th>Open Layer</th><th>Commercial Layer</th></tr>
-        <tr><td>HashiCorp</td><td>Terraform</td><td>Terraform Cloud ($14B IPO)</td></tr>
-        <tr><td>Elastic</td><td>Elasticsearch</td><td>Elastic Cloud ($4.6B IPO)</td></tr>
-        <tr><td>MongoDB</td><td>MongoDB</td><td>Atlas ($30B+ mkt cap)</td></tr>
-        <tr><td>Juspay</td><td>Hyperswitch</td><td>HyperPG</td></tr>
-        <tr><td><strong class="hi">Cashfree</strong></td><td><strong>Clawpay</strong></td><td><strong class="gr">Cashfree AI Studio</strong></td></tr>
-      </table>
-      <div class="callout mt-16">
-        <p class="sm">Razorpay Agent Studio is proprietary. No community. No ecosystem.<br><strong>Cashfree open-sources the engine. That&rsquo;s the category leadership move.</strong></p>
+    <div class="col">
+      <h3 class="mb-24">Why deterministic rules, not LLM-per-action</h3>
+      <p class="body mb-24">Razorpay burns Claude tokens on every agent action. Works for 50 cart recoveries/day. For 10M accounts in continuous monitoring? Astronomical.</p>
+      <p class="body mb-24">Clawpay: 99% deterministic rules (zero cost). 1% AI edge cases (worth the tokens). AI parser for config generation (one-time).</p>
+      <div class="card accent">
+        <p class="body">AI generates the config. Rules execute at zero cost. AI handles edge cases. That's it.</p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S7: ANSWER -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide mid" data-s="agents">
-  <p class="label">The answer</p>
-  <h1>Razorpay has 8 agents. All post-transaction.<br>We have <span class="hi">41</span>. Full lifecycle.</h1>
-  <div class="g4 mt-24" style="max-width:1000px;margin-left:auto;margin-right:auto;">
-    <div class="card glow" style="text-align:left;">
-      <span class="tag t-red mb-8">8 agents</span>
-      <h3>Match Razorpay</h3>
-      <p class="sub-s mt-8">Dispute Shield, Cart Reclaimer, Mandate Reviver, CashRadar, RTO Guard, RTO Lens, Daily Ledger, Conversational Checkout</p>
-    </div>
-    <div class="card glow" style="text-align:left;">
-      <span class="tag t-accent mb-8">5 agents</span>
-      <h3>Verify &amp; Comply</h3>
-      <p class="sub-s mt-8">Compliance Agent, Re-KYC Enforcer, Instant KYC, Credit Pre-Screen, Mule Detector</p>
-    </div>
-    <div class="card glow" style="text-align:left;">
-      <span class="tag t-green mb-8">4 agents</span>
-      <h3>Move Money</h3>
-      <p class="sub-s mt-8">Allocation Agent, Marketplace Disbursement, Escrow Orchestrator, Refund Dispatch</p>
-    </div>
-    <div class="card glow" style="text-align:left;">
-      <span class="tag t-cyan mb-8">24 agents</span>
-      <h3>Commerce + Ops + Risk</h3>
-      <p class="sub-s mt-8">FlowWise Routing, RiskShield (PG+Payouts), EMI Optimizer, One-Click Conversion, Cashfree Here, UPI Autopay, eNACH, Preauth, CrossBorder, +15 more</p>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S8: COMPLIANCE AGENT -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide" data-s="agents">
-  <p class="label">Compliance Agent</p>
-  <h2>One loan disbursal. 6 vendors today. One config with Clawpay.</h2>
-  <div class="flow mt-20 mb-24">
-    <span class="fs">Aadhaar OCR</span><span class="fa">&rarr;</span>
-    <span class="fs">PAN OCR</span><span class="fa">&rarr;</span>
-    <span class="fs">FaceMatch</span><span class="fa">&rarr;</span>
-    <span class="fs">Liveness</span><span class="fa">&rarr;</span>
-    <span class="fs">Bank Verify</span><span class="fa">&rarr;</span>
-    <span class="fs active">Eligibility Rule</span><span class="fa">&rarr;</span>
-    <span class="fs active">Allocation</span><span class="fa">&rarr;</span>
-    <span class="fs" style="border-color:var(--green);color:var(--green);">Cashfree Payout</span>
-  </div>
-  <div class="g2">
-    <div class="code"><span class="c"># Allocation fires automatically:</span>
-Loan amount:       <span class="v">&#8377;2,00,000</span>
-Processing fee 2%: <span class="v">&#8377;4,000</span>  &rarr; Platform
-Co-lending split:  <span class="v">80%</span> Bank A / <span class="v">20%</span> NBFC B
-Insurance:         <span class="v">&#8377;450</span>   &rarr; Insurer
-Net disbursal:     <span class="s">&#8377;1,95,550</span> &rarr; Borrower
-
-<span class="k">Total flow time: 4.2 seconds</span></div>
-    <div>
-      <div class="g2" style="gap:16px;">
-        <div class="card-s bl-red">
-          <p class="tag t-red mb-8">Today</p>
-          <ul class="bl sm"><li>4-6 vendor integrations</li><li>Weeks of engineering</li><li>Excel allocation</li><li>Manual payout</li></ul>
-        </div>
-        <div class="card-s bl-green">
-          <p class="tag t-green mb-8">Clawpay</p>
-          <ul class="bl sm"><li>One YAML config</li><li>2-hour setup</li><li>Auto allocation</li><li>Autonomous disbursal</li></ul>
-        </div>
-      </div>
-      <div class="callout mt-16">
-        <p class="sm"><strong>ICP:</strong> Mid-market NBFCs (&#8377;100-500 Cr AUM). 2,000+ in India. Under RBI compliance pressure. Can&rsquo;t afford Lentra&rsquo;s pricing or timeline.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S9: AI PARSER -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide" data-s="arch">
-  <p class="label">Architecture</p>
-  <h2>Tell it what you want in plain English. It wires up Cashfree APIs for you.</h2>
-  <div class="g2 mt-24">
-    <div>
-      <div class="card mb-16" style="border-color:var(--cyan)">
-        <h3 class="cy">AI Parser: Plug Cashfree Rails in Seconds</h3>
-        <p class="sub-s mt-12">You describe the flow. Clawpay generates the YAML, maps it to Cashfree endpoints, wires trigger &rarr; rule &rarr; action. Done.</p>
-        <div class="code mt-16"><span class="c"># You describe:</span>
-<span class="s">"Verify Aadhaar, match face,
- check CIBIL &gt; 680,
- disburse 80/20 co-lending split"</span>
-
-<span class="c"># Clawpay generates:</span>
-<span class="k">trigger:</span> webhook/loan-apply
-<span class="k">steps:</span>
-  - <span class="k">verify:</span> smartocr/aadhaar
-  - <span class="k">verify:</span> facematch
-  - <span class="k">rule:</span> cibil_score > <span class="v">680</span>
-  - <span class="k">allocate:</span>
-      bank_a: <span class="v">80%</span>
-      nbfc_b: <span class="v">20%</span>
-  - <span class="k">execute:</span> cashfree/payouts</div>
-      </div>
-    </div>
-    <div>
-      <div class="card mb-16">
-        <h3 class="hi">Three-Layer Architecture</h3>
-        <div class="card-s bl-cyan mt-12 mb-8">
-          <p class="sm"><strong class="cy">Trigger Layer:</strong> Webhooks, schedules, form submissions, API events, doc uploads</p>
-        </div>
-        <div class="card-s bl-accent mb-8">
-          <p class="sm"><strong class="hi">Rule Engine:</strong> Eligibility, allocation, risk, compliance, workflow routing, retry &amp; fallback. DAG-based. No-code visual builder. Maker-checker.</p>
-        </div>
-        <div class="card-s bl-green">
-          <p class="sm"><strong class="gr">Action Layer (Cashfree):</strong> SmartOCR, FaceMatch, Liveness, Payment Links, Forms, Payouts, Bank Verify, PG</p>
-        </div>
-      </div>
-      <div class="card bl-green">
-        <h3 class="gr">Simulation Engine</h3>
-        <p class="sub-s mt-8">Test any flow with mock data. No API keys. No sandbox account. No onboarding call.</p>
-        <div class="code mt-12" style="font-size:12px;padding:14px;"><span class="k">$</span> docker pull clawpay/gateway
-<span class="k">$</span> docker-compose up -d
-<span class="c"># Open browser &rarr; Build flow &rarr; Simulate &rarr; Deploy</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S10: RUNTIME ECONOMICS -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide" data-s="arch">
-  <p class="label">Why this architecture wins</p>
-  <h2>Razorpay burns tokens on every action. Clawpay runs rules at zero cost.</h2>
-  <div class="g2 mt-24">
-    <div class="card bl-amber">
-      <h3 class="am">Razorpay Agent Studio</h3>
-      <p class="sub-s mt-12">Every action goes through Claude SDK. Observe &rarr; Reason &rarr; Execute. Works fine for 50 cart recoveries/day.</p>
-      <div class="card-s mt-16" style="background:var(--amber-dim);">
-        <p class="sm"><strong>Token cost per action.</strong> Scales with usage volume. For a bank running continuous monitoring on 10M accounts, the LLM cost would be astronomical.</p>
-      </div>
-    </div>
-    <div class="card bl-green">
-      <h3 class="gr">Clawpay</h3>
-      <p class="sub-s mt-12">Rules are code, not LLM calls. AI only touches config generation (one-time) and edge cases (1% of decisions). The rest is free.</p>
-      <div class="card-s mt-16" style="background:var(--green-dim);">
-        <p class="sm"><strong>Zero token cost at runtime.</strong> 99% of decisions are deterministic rules. AI touches config generation + edge cases only. Scales to millions of accounts.</p>
-      </div>
-    </div>
-  </div>
-  <div class="callout mt-24">
-    <p class="sm"><strong>How it should work:</strong> AI generates the config (one-time, high value). Rules execute at zero cost (infinite scale). AI handles edge cases (1%, worth the tokens). That&rsquo;s it.</p>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S11: MARKET SIZE -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide" data-s="market">
-  <p class="label">Market</p>
-  <h2>$19B TAM globally. $133B in India digital lending alone by 2030.</h2>
-  <div class="g4 mt-24 mb-24">
-    <div class="stat"><div class="n sm-n hi">$19.3B</div><div class="l">Decision Management<br>TAM by 2032</div></div>
-    <div class="stat"><div class="n sm-n gr">$133B</div><div class="l">India digital lending<br>revenue by 2030</div></div>
-    <div class="stat"><div class="n sm-n am">87%</div><div class="l">India fintech<br>adoption rate</div></div>
-    <div class="stat"><div class="n sm-n cy">45%</div><div class="l">of 2024 funding went<br>to BFSI SaaS infra</div></div>
-  </div>
-  <div class="g2">
-    <div>
-      <h3 class="mb-12">On-Prem Gap (Confirmed by Research)</h3>
-      <table>
-        <tr><th>Vendor</th><th>On-Prem?</th></tr>
-        <tr><td>IDfy</td><td><span class="cx">&cross;</span> <span class="dim sm">&ldquo;Cannot integrate with on-premise&rdquo;</span></td></tr>
-        <tr><td>HyperVerge</td><td><span class="cw">?</span> <span class="dim sm">Not publicly confirmed</span></td></tr>
-        <tr><td>Signzy</td><td><span class="cw">?</span> <span class="dim sm">Not publicly confirmed</span></td></tr>
-        <tr><td>Lentra</td><td><span class="cx">&cross;</span> <span class="dim sm">Cloud-only</span></td></tr>
-        <tr><td>Perfios</td><td><span class="ck">&check;</span> <span class="dim sm">Yes, but no execution layer</span></td></tr>
-        <tr><td><strong>Clawpay</strong></td><td><span class="ck">&check;</span> <strong class="gr">Docker-first. BRE + Execute + Verify.</strong></td></tr>
-      </table>
-    </div>
-    <div>
-      <h3 class="mb-12">Post-Juspay Orchestration Vacuum</h3>
-      <ul class="bl">
-        <li>PhonePe, Razorpay, Cashfree, Paytm all cut ties with Juspay (Dec 2024 to Apr 2025)</li>
-        <li>Juspay open-sourced Hyperswitch (40K GitHub stars), but only payment routing</li>
-        <li><strong>Nobody is doing for verify &rarr; decide &rarr; execute what Hyperswitch did for payment routing</strong></li>
-      </ul>
-      <div class="card-s bl-green mt-16">
-        <p class="sm"><strong>BRE adoption is proving ROI:</strong> Oxyzo reported 30% underwriting reduction + 40% ops improvement. PwC: BRE lead filtering cuts CAC by ~30%.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S12: COMPETITION TABLE -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide" data-s="vs">
-  <p class="label">Competition</p>
-  <h2>Look at this table. Every player has a gap. We fill all of them.</h2>
-  <div class="mt-20" style="overflow-x:auto;">
+<!-- ══════════════════════════════════════════════ -->
+<!-- 13. COMPETITION -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl" data-s="mkt">
+  <p class="kicker">Competition</p>
+  <h2 class="mb-48">Every player has a gap. We fill all of them.</h2>
+  <div style="overflow-x:auto;">
     <table>
-      <tr><th></th><th style="color:var(--accent-light)">Clawpay</th><th>Razorpay<br>Agent Studio</th><th>HyperVerge</th><th>Lentra</th><th>Perfios</th></tr>
-      <tr><td><strong>Focus</strong></td><td>Pre-txn compliance &amp; execution</td><td>Post-txn intelligence</td><td>Identity verification</td><td>Lending platform</td><td>Data aggregation</td></tr>
-      <tr><td><strong>Verify</strong></td><td><span class="ck">&check;</span> Cashfree native</td><td><span class="cx">&cross;</span> None</td><td><span class="ck">&check;</span> World-class</td><td><span class="cx">&cross;</span></td><td><span class="cw">~</span></td></tr>
-      <tr><td><strong>Decide</strong></td><td><span class="ck">&check;</span> Full DAG BRE</td><td><span class="cw">~</span> LLM reasoning</td><td><span class="cw">~</span> Linear builder</td><td><span class="ck">&check;</span> Lending-only</td><td><span class="cw">~</span></td></tr>
-      <tr><td><strong>Execute</strong></td><td><span class="ck">&check;</span> PG + Payouts</td><td><span class="ck">&check;</span> PG + Payouts</td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td></tr>
-      <tr><td><strong>Allocate</strong></td><td><span class="ck">&check;</span> Splits, escrow</td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td></tr>
-      <tr><td><strong>On-Prem</strong></td><td><span class="ck">&check;</span> Docker, hours</td><td><span class="cx">&cross;</span> Cloud-only</td><td><span class="cw">?</span></td><td><span class="cx">&cross;</span></td><td><span class="ck">&check;</span></td></tr>
-      <tr><td><strong>AI Model</strong></td><td>Rules + AI parser</td><td>Claude Agent SDK</td><td>Proprietary ML</td><td>Proprietary</td><td>Proprietary</td></tr>
-      <tr><td><strong>Runtime Cost</strong></td><td style="color:var(--green)">Zero tokens</td><td style="color:var(--amber)">Tokens per action</td><td>Per API call</td><td>License</td><td>License</td></tr>
-      <tr><td><strong>Open Source</strong></td><td><span class="ck">&check;</span> MIT core</td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td><td><span class="cx">&cross;</span></td></tr>
-      <tr><td><strong>Revenue</strong></td><td>-</td><td>Within Razorpay</td><td>&#8377;149 Cr</td><td>&#8377;217 Cr</td><td>&#8377;709 Cr</td></tr>
+      <tr><th></th><th style="color:var(--accent)">Clawpay + AI Studio</th><th>Razorpay Agent Studio</th><th>HyperVerge</th><th>Lentra</th><th>Perfios</th></tr>
+      <tr><td>Agents</td><td><strong>35</strong></td><td>8</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr><td>Scope</td><td>Full lifecycle</td><td>Post-txn only</td><td>Verify only</td><td>Decide only</td><td>Data only</td></tr>
+      <tr><td>Verify</td><td class="ck">&#10003;</td><td class="cx">&#10005;</td><td class="ck">&#10003;</td><td class="cx">&#10005;</td><td class="cx">~</td></tr>
+      <tr><td>Execute</td><td class="ck">&#10003;</td><td class="ck">&#10003;</td><td class="cx">&#10005;</td><td class="cx">&#10005;</td><td class="cx">&#10005;</td></tr>
+      <tr><td>Allocate</td><td class="ck">&#10003;</td><td class="cx">&#10005;</td><td class="cx">&#10005;</td><td class="cx">&#10005;</td><td class="cx">&#10005;</td></tr>
+      <tr><td>On-Prem</td><td class="ck">&#10003; Docker</td><td class="cx">Cloud-only</td><td class="cx">?</td><td class="cx">Cloud-only</td><td class="ck">&#10003;</td></tr>
+      <tr><td>Open Source</td><td class="ck">MIT core</td><td class="cx">Proprietary</td><td class="cx">No</td><td class="cx">No</td><td class="cx">No</td></tr>
+      <tr><td>Runtime Cost</td><td style="color:var(--green)">Zero tokens</td><td style="color:var(--amber)">Tokens/action</td><td>Per API</td><td>License</td><td>License</td></tr>
     </table>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S13: RAZORPAY POSITIONING -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide" data-s="vs">
-  <p class="label">Positioning</p>
-  <h2>Razorpay kept it proprietary. We&rsquo;re open-sourcing the engine. That&rsquo;s the play.</h2>
-  <div class="g2 mt-24">
-    <div>
-      <div class="card bl-amber mb-16">
-        <h3 class="am">Razorpay Agent Studio (Closed)</h3>
-        <p class="sub-s mt-8">8 agents. Proprietary. Built on Claude SDK. Merchants use it or they don&rsquo;t. No community. No ecosystem. No contributors.</p>
-        <p class="sm dim mt-12">The <strong>Salesforce</strong> play. Works. But doesn&rsquo;t create the standard.</p>
-      </div>
-      <div class="card bl-green mb-16">
-        <h3 class="gr">Clawpay (Open-Source Layer)</h3>
-        <p class="sub-s mt-8">MIT-licensed engine on GitHub. Any developer can use it. Works with any payment rail. Community contributes agents. Sets the standard.</p>
-        <p class="sm dim mt-12">The <strong>Terraform / Elasticsearch / MongoDB</strong> play.</p>
-      </div>
-      <div class="card bl-accent">
-        <h3 class="hi">Cashfree AI Studio (Commercial Layer)</h3>
-        <p class="sub-s mt-8">41 agents. Managed, hosted, Cashfree-native. 8L+ merchants activate with one click. Enterprise support + SLA. Revenue.</p>
-        <p class="sm dim mt-12">Same engine as Clawpay. Deeper integration. Full support. <strong>Monetizes the standard.</strong></p>
-      </div>
+<!-- ══════════════════════════════════════════════ -->
+<!-- 14. MARKET -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl" data-s="mkt">
+  <p class="kicker">Market</p>
+  <h2 class="mb-48">$19B TAM. $133B India digital lending by 2030.</h2>
+  <div class="grid-4">
+    <div><div class="stat-num hi">$19.3B</div><div class="stat-label">Decision Management<br>TAM by 2032</div></div>
+    <div><div class="stat-num gr">$133B</div><div class="stat-label">India digital lending<br>by 2030</div></div>
+    <div><div class="stat-num am">87%</div><div class="stat-label">India fintech<br>adoption rate</div></div>
+    <div><div class="stat-num" style="color:var(--cyan)">8L+</div><div class="stat-label">Existing Cashfree<br>merchants to activate</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 15. STRATEGY -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl" data-s="strat">
+  <p class="kicker">Build plan</p>
+  <h2 class="mb-48">Two tracks. In parallel.</h2>
+  <div class="row">
+    <div class="col">
+      <h3 class="gr mb-24">Clawpay (Open Layer)</h3>
+      <p class="body mb-16"><strong>Q2 2026:</strong> Core engine on GitHub. MIT. Rule engine + AI parser + simulation.</p>
+      <p class="body mb-16"><strong>Q3 2026:</strong> Community agent templates. Conference talks. Developer advocacy.</p>
+      <p class="body"><strong>Q4 2026+:</strong> Becomes the agentic payments standard. Like Terraform for infra.</p>
     </div>
-    <div style="display:flex;flex-direction:column;justify-content:center;">
-      <div class="card glow">
-        <p class="sm dim mb-8">THE TWO-LAYER STRATEGY</p>
-        <div class="flow gap-12" style="flex-direction:column;align-items:stretch;">
-          <div class="card-s" style="background:var(--green-dim);border-color:var(--green);text-align:center;">
-            <p class="sm bold gr">CLAWPAY (Open)</p>
-            <p class="xs dim">GitHub stars &rarr; developer love &rarr; conference talks &rarr; community agents &rarr; becomes the standard</p>
-          </div>
-          <div style="text-align:center;"><span class="dim">&darr; developers scale up &darr;</span></div>
-          <div class="card-s" style="background:var(--accent-glow-strong);border-color:var(--accent);text-align:center;">
-            <p class="sm bold hi">CASHFREE AI STUDIO (Commercial)</p>
-            <p class="xs dim">Managed hosting &rarr; Cashfree-native &rarr; enterprise support &rarr; 8L+ merchants &rarr; revenue</p>
-          </div>
-        </div>
-        <div class="callout mt-16">
-          <p class="sm center"><strong>Razorpay has a product.<br>Cashfree would have a movement.</strong></p>
-        </div>
-      </div>
+    <div class="col">
+      <h3 class="hi mb-24">Cashfree AI Studio (Commercial)</h3>
+      <p class="body mb-16"><strong>Q2 2026:</strong> First 8 agents (match Razorpay). One-click for 8L+ merchants.</p>
+      <p class="body mb-16"><strong>Q3 2026:</strong> Expand to 20+ agents. Verify + disburse + commerce.</p>
+      <p class="body"><strong>Q4 2026+:</strong> 35 agents. Enterprise on-prem. Docker. Top 25 banks.</p>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S14: BUILD PLAN -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide" data-s="build">
-  <p class="label">Build plan</p>
-  <h2>Ship both layers in parallel. Open-source creates the standard. AI Studio captures the revenue.</h2>
-  <div class="g2 mt-24">
-    <div>
-      <h3 class="gr mb-16">Clawpay (Open Layer)</h3>
-      <div class="tl-item">
-        <span class="tag t-green mb-8">Q2 2026</span>
-        <h3>Core engine on GitHub (MIT)</h3>
-        <p class="sub-s mt-4">Rule engine + AI parser + simulation. Works with any payment rail. Developers try it for free. Start accumulating GitHub stars.</p>
-      </div>
-      <div class="tl-item">
-        <span class="tag t-green mb-8">Q3 2026</span>
-        <h3>Agent templates + community</h3>
-        <p class="sub-s mt-4">Pre-built agents: Compliance, Allocation, Monitoring. Community contributes more. Conference talks. Developer advocacy.</p>
-      </div>
-      <div class="tl-item">
-        <span class="tag t-green mb-8">Q4 2026+</span>
-        <h3>Becomes the standard</h3>
-        <p class="sub-s mt-4">Like Terraform for infra, Elasticsearch for search. Clawpay = the agentic payments engine. Ecosystem compounds.</p>
-      </div>
-    </div>
-    <div>
-      <h3 class="hi mb-16">Cashfree AI Studio (Commercial Layer)</h3>
-      <div class="tl-item">
-        <span class="tag t-accent mb-8">Q2 2026</span>
-        <h3>First 8 agents (match Razorpay)</h3>
-        <p class="sub-s mt-4">Dispute Shield, Cart Reclaimer, RTO Guard, CashRadar, + 4 more. Activate for existing 8L+ merchants. One-click enable in dashboard.</p>
-      </div>
-      <div class="tl-item">
-        <span class="tag t-accent mb-8">Q3 2026</span>
-        <h3>Expand to 20+ agents</h3>
-        <p class="sub-s mt-4">Verify agents (Secure ID), money movement agents (Payouts, Easy Split), commerce agents (FlowWise, RiskShield, EMI Optimizer).</p>
-      </div>
-      <div class="tl-item">
-        <span class="tag t-accent mb-8">Q4 2026+</span>
-        <h3>41 agents + enterprise on-prem</h3>
-        <p class="sub-s mt-4">Full catalog. Docker on-prem for banks. ISO 27001. CISO-ready. Top 25 banks. Revenue scales with merchant growth.</p>
-      </div>
-      <div class="card-s bl-amber mt-16">
-        <p class="sm"><strong class="am">Pricing:</strong> Agents are add-ons to existing Cashfree plans. Usage-based. No new billing relationship. Upsell, not new sale.</p>
-      </div>
-    </div>
-  </div>
+<!-- ══════════════════════════════════════════════ -->
+<!-- 16. CLOSE -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="sl center" data-s="strat">
+  <h1 style="max-width:700px;">Razorpay has a product.<br>Cashfree would have<br>a <span class="gr">movement</span>.</h1>
+  <p class="lead" style="margin:var(--s-32) auto 0;">35 agents. 39 products. Open-core engine.<br>Clawpay sets the standard. Cashfree AI Studio captures the revenue.</p>
+  <p class="note mt-48">github.com/mothivenkatesh/clawpay</p>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- S15: CTA -->
-<!-- ═══════════════════════════════════════════════════ -->
-<div class="slide mid" data-s="build">
-  <div class="flex gap-24 mb-24" style="justify-content:center;align-items:center;">
-    <div class="logo" style="font-size:30px;"><span class="c">Claw</span>pay</div>
-    <span class="dim" style="font-size:24px;">+</span>
-    <div class="logo" style="font-size:30px;"><span class="gr">Cashfree</span> AI Studio</div>
-  </div>
-  <h1>Razorpay has a product.<br>Cashfree would have a <span class="gr">movement</span>.</h1>
-  <p class="sub mb-32">
-    Open-source the engine. Commercialize the platform.<br>
-    41 agents. 39 Cashfree products. Every workflow automated.<br>
-    <strong>That&rsquo;s how you become the leader, not the follower.</strong>
-  </p>
-  <div class="g3 mt-8" style="max-width:640px;margin:0 auto;">
-    <div class="stat"><div class="n sm-n">Hours</div><div class="l">to deploy</div></div>
-    <div class="stat"><div class="n sm-n gr">100%</div><div class="l">of the loop closed</div></div>
-    <div class="stat"><div class="n sm-n hi">MIT</div><div class="l">open-core</div></div>
-  </div>
-  <div class="flex gap-16 mt-32" style="justify-content:center;">
-    <span class="tag t-accent" style="font-size:13px;padding:6px 16px;">Star Clawpay on GitHub</span>
-    <span class="tag t-green" style="font-size:13px;padding:6px 16px;">Activate Cashfree AI Studio</span>
-    <span class="tag t-cyan" style="font-size:13px;padding:6px 16px;">Build Your First Agent</span>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════ -->
 <!-- NAV -->
-<!-- ═══════════════════════════════════════════════════ -->
 <div class="nav">
   <button onclick="go(-1)">&larr;</button>
-  <div class="ct" id="ct">1 / 15</div>
+  <div class="c" id="ct"></div>
   <button onclick="go(1)">&rarr;</button>
 </div>
 
 <script>
-const S=document.querySelectorAll('.slide'),P=document.getElementById('progress'),
-C=document.getElementById('ct'),SP=document.querySelectorAll('#signpost span');
+const S=document.querySelectorAll('.sl'),B=document.getElementById('bar'),
+C=document.getElementById('ct'),P=document.querySelectorAll('#pills span');
 let i=0;
-function show(n){S[i].classList.remove('active');i=Math.max(0,Math.min(n,S.length-1));
-S[i].classList.add('active');C.textContent=`${i+1} / ${S.length}`;
-P.style.width=`${(i+1)/S.length*100}%`;
-const s=S[i].dataset.s;SP.forEach(x=>x.classList.toggle('active',x.dataset.s===s));}
+function show(n){S[i].classList.remove('on');i=Math.max(0,Math.min(n,S.length-1));
+S[i].classList.add('on');C.textContent=`${i+1}/${S.length}`;
+B.style.width=`${(i+1)/S.length*100}%`;
+const s=S[i].dataset.s;P.forEach(x=>x.classList.toggle('on',x.dataset.s===s));}
 function go(d){show(i+d);}
 document.addEventListener('keydown',e=>{
 if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(1);}
-if(e.key==='ArrowLeft'){e.preventDefault();go(-1);}
-if(e.key==='Home'){e.preventDefault();show(0);}
-if(e.key==='End'){e.preventDefault();show(S.length-1);}});
+if(e.key==='ArrowLeft'){e.preventDefault();go(-1);}});
 let ts=0;
 document.addEventListener('touchstart',e=>{ts=e.touches[0].clientX;});
 document.addEventListener('touchend',e=>{const d=ts-e.changedTouches[0].clientX;if(Math.abs(d)>60)go(d>0?1:-1);});
