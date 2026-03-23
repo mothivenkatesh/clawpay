@@ -108,34 +108,85 @@ Razorpay started this conversation. Clawpay finishes it.
 
 ---
 
+## Part 4: Additional Agents (Products Previously Missing)
+
+These cover One Click Checkout, Cashfree Here (agentic payments), UPI Autopay, eNACH, Card EMI/Cardless EMI, BNPL, FlowWise Smart Routing, RiskShield (PG + Payouts), International Payments with Apple Pay, and Preauthorization.
+
+| # | Agent Name | Cashfree Products | What It Does | Who Buys It |
+|---|-----------|-------------------|-------------|-------------|
+| 29 | **One-Click Conversion Agent** | One Click Checkout + Token Vault (Saved Cards) + UPI Autopay | Detects returning customers. Auto-surfaces saved payment instruments. Reduces checkout to single tap. Tracks conversion lift per instrument type. | D2C brands, e-commerce |
+| 30 | **Cashfree Here Agent (Agentic Commerce)** | Cashfree Here (MCP) + Payment Gateway + Secure ID | The in-chat commerce agent. Customers browse, get recommendations, and pay inside the AI conversation. No redirect. No external checkout page. Verification inline if needed. | AI-native apps, chatbot commerce, Swiggy-style platforms |
+| 31 | **UPI Autopay Recovery Agent** | UPI Autopay (Mandate Creation, Payment Scheduler) + Subscriptions API | Creates UPI mandates for recurring payments. On mandate failure: auto-retries at optimal time windows (payday, month-start). Sends WhatsApp nudge with one-tap re-authorize link. Tracks mandate creation-to-activation conversion. | SaaS, EdTech, insurance, OTT |
+| 32 | **eNACH Lifecycle Agent** | eNACH (e-Mandate Creation, Activation, Debit) + Physical NACH | Creates e-mandates. Monitors activation (1-2 day window). On activation failure: falls back to Physical NACH or UPI Autopay. Schedules auto-debits. Retries failed debits with intelligent cadence. 98% success rate on subsequent EMIs. | NBFCs, lending, insurance |
+| 33 | **EMI Optimizer Agent** | Card EMI (15+ issuers) + Cardless EMI (FlexMoney, ZestMoney, KreditBee) + BNPL (Simpl, LazyPay, ePayLater) + Offers API | On high-value cart: checks customer eligibility across all EMI/BNPL providers. Surfaces the best EMI option (lowest interest, longest tenure, no-cost). Dynamically shows BNPL options on product pages via BNPL Plus. Increases AOV. | E-commerce, D2C, electronics, furniture |
+| 34 | **FlowWise Routing Agent** | FlowWise (Smart Routing, Threshold Routing, Volume-Based Routing, Dynamic Routing) | Monitors real-time success rates across all integrated PGs. Auto-routes transactions to the highest-performing gateway in the last 15/30 minutes. Falls back on threshold breach. Reports routing performance daily. Cuts processing cost up to 40%. | Any merchant with 2+ payment gateways |
+| 35 | **RiskShield Gateway Agent** | RiskShield for PG (Shield Pro ML, Blacklists, Smart Limits, Velocity Checks, Device Fingerprinting) | Evaluates every transaction in real time. Blocks fraudulent accounts via ML. Enforces merchant-defined smart limits (frequency, cumulative sum per hour/day/week). Auto-blacklists bad actors. Reduces fraud by up to 40%. | All PG merchants |
+| 36 | **RiskShield Payouts Agent** | RiskShield for Payouts (Disbursal Risk Scoring, Beneficiary Verification) | Screens every outbound payout against risk signals. Validates beneficiary via BAV before disbursement. Flags suspicious payout patterns. Blocks high-risk disbursals. Essential for lending, marketplace, and gig payouts. | NBFCs, marketplaces, gig platforms |
+| 37 | **Preauth Hold Agent** | Preauthorization / Auth-Only Payments + Capture/Void | For hotel bookings, car rentals, subscription trials: places a hold on the card without charging. Monitors fulfillment events. Auto-captures when service delivered. Auto-voids if cancelled within window. Zero manual intervention. | Travel, hospitality, subscription trials |
+| 38 | **International Checkout Agent** | International Payments (140+ currencies) + Apple Pay + Dynamic Currency Conversion | Detects international card BIN. Auto-shows price in customer's local currency. Enables Apple Pay for supported cards (reduces dropoff by up to 75%). Routes to optimal international acquiring bank. Reconciles FX settlements. | Export businesses, SaaS with global customers, ed-tech |
+| 39 | **Net Banking & Wallet Router** | Net Banking (65+ banks) + Wallets (PhonePe, Paytm, Amazon Pay, Freecharge) | On checkout: detects customer's bank/wallet preference from past transactions. Pre-selects the most likely payment method. Falls back to next-best on failure. Tracks method-level success rates. | E-commerce, utilities, government payments |
+| 40 | **Auto Collect Reconciler** | Auto Collect (Virtual Account creation, payment matching) | Creates unique virtual accounts per customer/invoice. Auto-matches incoming NEFT/IMPS/UPI to open invoices. Marks as paid. Triggers fulfillment. Sends receipt. Eliminates manual bank statement matching. | B2B, SaaS, educational institutions |
+| 41 | **COD-to-Prepaid Converter** | Payment Links + RiskShield + UPI Intent | On COD order placement: runs RiskShield score. If high-risk: auto-generates a prepaid Payment Link with small incentive (discount/cashback). Sends via WhatsApp. If customer pays, converts to prepaid. If not, flags for ops review. Reduces RTO by 30-50%. | D2C, quick commerce, fashion e-commerce |
+
+---
+
+## Updated Full Count
+
+| Category | Count | Razorpay Has? |
+|----------|-------|--------------|
+| Razorpay-matching agents | 8 | Yes (we match all 8) |
+| Verify & Comply agents | 5 | No |
+| Money Movement agents | 4 | No |
+| Commerce & Ops agents | 2 | No |
+| Deep Integration agents | 9 | No |
+| **Checkout/Commerce/Routing/Risk agents (NEW)** | **13** | Partially (only RTO + cart) |
+| **Total Clawpay agents** | **41** | **Razorpay has 8. We have 41.** |
+
+---
+
 ## Cashfree Products Mapped (Complete List)
 
 | Cashfree Product | Agent(s) Using It |
 |-----------------|-------------------|
-| Payment Gateway (Orders, Payments) | Cart Reclaimer, Conversational Checkout, RTO Guard, Offer Optimizer |
-| Payment Links | Cart Reclaimer, Bill Collection, Refund Dispatch |
-| Payment Forms | Conversational Checkout |
-| Subscriptions / Mandates | Mandate Reviver |
-| Cards & Token Vault | Card Vault Intelligence |
-| UPI / Virtual Banking | Inward Reconciler |
-| Disputes API | Dispute Shield |
-| Refunds API | RTO Lens, Refund Dispatch |
-| Settlements / Reconciliation | CashRadar, Daily Ledger, RTO Lens, CrossBorder Settlement |
-| Risk Management | RTO Guard, RiskShield Agent |
-| Offers & Eligibility | Offer Optimizer |
-| Payouts (Direct/Batch/Internal) | Allocation Agent, Payroll Autopilot, Marketplace Disbursement |
-| Easy Split | Marketplace Disbursement, Daily Ledger |
-| OneEscrow | Escrow Orchestrator |
-| Cashgram | Mandate Reviver, Refund Dispatch |
-| Secure ID (Full Suite) | Compliance Agent, Re-KYC Enforcer, Instant KYC, Credit Pre-Screen, Mule Detector, Dispute Shield, RTO Guard |
-| 1-Click Onboarding (Mobile360) | Instant KYC |
-| Account Aggregator | Credit Pre-Screen |
-| E-Sign | E-Sign Closer, Re-KYC Enforcer |
-| BBPS | Bill Collection Agent |
-| PPI Wallet | Wallet Lifecycle Agent |
-| SoftPOS | Field Ops Monitor |
-| Platforms (Sub-Merchant) | Sub-Merchant Activator |
-| International Payments | CrossBorder Settlement Agent |
-| Flowwise | All agents (simplified integration layer) |
+| **Payment Gateway** (Orders, Payments, OTP) | Cart Reclaimer, Conversational Checkout, RTO Guard, Offer Optimizer, FlowWise Routing, RiskShield Gateway |
+| **One Click Checkout** | One-Click Conversion Agent |
+| **Cashfree Here (Agentic Payments)** | Cashfree Here Agent |
+| **Payment Links** | Cart Reclaimer, Bill Collection, Refund Dispatch, COD-to-Prepaid Converter |
+| **Payment Forms** | Conversational Checkout |
+| **UPI Autopay** | UPI Autopay Recovery Agent, Mandate Reviver |
+| **eNACH / Physical NACH** | eNACH Lifecycle Agent |
+| **Card EMI (15+ issuers)** | EMI Optimizer Agent |
+| **Cardless EMI (FlexMoney, ZestMoney, KreditBee)** | EMI Optimizer Agent |
+| **BNPL / Pay Later (Simpl, LazyPay, ePayLater)** | EMI Optimizer Agent |
+| **Preauthorization / Auth-Only** | Preauth Hold Agent |
+| **Token Vault / Saved Cards** | Card Vault Intelligence, One-Click Conversion Agent |
+| **Net Banking (65+ banks)** | Net Banking & Wallet Router |
+| **Wallets (PhonePe, Paytm, Amazon Pay)** | Net Banking & Wallet Router |
+| **Subscriptions / Mandates** | Mandate Reviver, UPI Autopay Recovery, eNACH Lifecycle |
+| **Offers & Eligibility** | Offer Optimizer, EMI Optimizer |
+| **FlowWise (Smart Routing / Orchestration)** | FlowWise Routing Agent |
+| **RiskShield for PG** | RiskShield Gateway Agent, RTO Guard, COD-to-Prepaid Converter |
+| **RiskShield for Payouts** | RiskShield Payouts Agent |
+| **Disputes API** | Dispute Shield |
+| **Refunds API** | RTO Lens, Refund Dispatch |
+| **Instant Refunds** | Refund Dispatch |
+| **Settlements / Reconciliation** | CashRadar, Daily Ledger, RTO Lens, CrossBorder Settlement |
+| **Payouts (Direct/Batch/Internal/CardPay)** | Allocation Agent, Payroll Autopilot, Marketplace Disbursement, RiskShield Payouts |
+| **Easy Split** | Marketplace Disbursement, Daily Ledger |
+| **OneEscrow** | Escrow Orchestrator |
+| **Auto Collect** | Auto Collect Reconciler, Inward Reconciler |
+| **Cashgram** | Mandate Reviver, Refund Dispatch |
+| **Virtual Banking (VBA)** | Inward Reconciler, Auto Collect Reconciler |
+| **Secure ID (Full Suite)** | Compliance Agent, Re-KYC Enforcer, Instant KYC, Credit Pre-Screen, Mule Detector, Dispute Shield, RTO Guard, Cashfree Here Agent |
+| **1-Click Onboarding (Mobile360)** | Instant KYC |
+| **Account Aggregator** | Credit Pre-Screen |
+| **E-Sign** | E-Sign Closer, Re-KYC Enforcer |
+| **DigiLocker** | Compliance Agent |
+| **BBPS** | Bill Collection Agent |
+| **PPI Wallet** | Wallet Lifecycle Agent |
+| **SoftPOS** | Field Ops Monitor |
+| **Platforms (Sub-Merchant Onboarding)** | Sub-Merchant Activator |
+| **International Payments (140+ currencies)** | CrossBorder Settlement Agent, International Checkout Agent |
+| **Apple Pay (International Cards)** | International Checkout Agent |
 
-**Every Cashfree product has at least one Clawpay agent. No product left behind.**
+**41 agents. 39 Cashfree products. Every single product has at least one Clawpay agent. No product left behind.**
